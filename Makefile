@@ -2,12 +2,12 @@
 # $FreeBSD: head/www/chromium/Makefile 504582 2019-06-19 17:25:17Z cpm $
 
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	79.0.3945.117
+PORTVERSION=	84.0.4147.105
 PORTREVISION=	1
 
 USE_GITHUB=     yes
-GH_TUPLE=       Eloston:ungoogled-chromium:3c77d92:ungoogled-chromium \
-                gliaskos:freebsd-chromium:af44d00:freebsd-chromium
+GH_TUPLE=       Eloston:ungoogled-chromium:cc3e311:ungoogled-chromium \
+                gliaskos:freebsd-chromium:fc2d3a2:freebsd-chromium
 
 CATEGORIES?=	www java
 MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:1 \
@@ -32,6 +32,7 @@ BUILD_DEPENDS+=	gperf:devel/gperf \
 		ffmpeg>=3.2.2,1:multimedia/ffmpeg \
 		flock:sysutils/flock \
 		node:www/node \
+		xcb-proto>0:x11/xcb-proto \
 		${LOCALBASE}/bin/ar:devel/binutils \
 		${LOCALBASE}/include/linux/videodev2.h:multimedia/v4l_compat \
 		${LOCALBASE}/share/usbids/usb.ids:misc/usbids \
@@ -167,11 +168,9 @@ ALSA_VARS=		GN_ARGS+=use_alsa=true
 ALSA_VARS_OFF=		GN_ARGS+=use_alsa=false
 
 CODECS_VARS=		GN_ARGS+=ffmpeg_branding="Chrome" \
-			GN_ARGS+=proprietary_codecs=true \
-			GN_ARGS+=enable_hevc_demuxing=true
+			GN_ARGS+=proprietary_codecs=true
 CODECS_VARS_OFF=	GN_ARGS+=ffmpeg_branding="Chromium" \
-			GN_ARGS+=proprietary_codecs=false \
-			GN_ARGS+=enable_hevc_demuxing=false
+			GN_ARGS+=proprietary_codecs=false
 
 CUPS_LIB_DEPENDS=	libcups.so:print/cups
 CUPS_VARS=		GN_ARGS+=use_cups=true
