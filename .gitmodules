@@ -1,6 +1,6 @@
 [submodule "freebsd-chromium"]
 	path = freebsd-chromium
-	url = https://github.com/gliaskos/freebsd-chromium
+	url = https://github.com/freebsd/freebsd-chromium
 [submodule "ungoogled-chromium"]
 	path = ungoogled-chromium
 	url = https://github.com/Eloston/ungoogled-chromium
