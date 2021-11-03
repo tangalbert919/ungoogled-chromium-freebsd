@@ -1,0 +1,7 @@
+Ungoogled-chromium is a Chromium-based browser project that seeks
+to remove as much Google integration from the browser as possible.
+
+This is an experimental FreeBSD port, so it should not be used
+for everyday tasks.
+
+WWW: https://www.github.com/Eloston/ungoogled-chromium
