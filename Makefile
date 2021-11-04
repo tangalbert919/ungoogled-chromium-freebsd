@@ -36,7 +36,8 @@ BUILD_DEPENDS=	bash:shells/bash \
 		${LOCALBASE}/share/usbids/usb.ids:misc/usbids \
 		${PYTHON_PKGNAMEPREFIX}html5lib>0:www/py-html5lib@${PY_FLAVOR} \
 		${LOCALBASE}/include/va/va.h:multimedia/libva \
-		${LOCALBASE}/bin/python2.7:lang/python27
+		${LOCALBASE}/bin/python2.7:lang/python27 \
+		patch>0:devel/patch
 
 LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
 		libatspi.so:accessibility/at-spi2-core \
@@ -289,7 +290,8 @@ pre-configure:
 	@${ECHO_MSG} "Applying patches"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/patches.py apply ${WRKSRC} \
-		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/patches
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/patches \
+		--patch-bin /usr/local/bin/gpatch
 	@${ECHO_MSG} "Applying domain substitution"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/domain_substitution.py apply \
