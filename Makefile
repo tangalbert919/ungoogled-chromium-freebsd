@@ -281,6 +281,21 @@ pre-configure:
 	${CP} -R \
 		${WRKSRC}/third_party/ffmpeg/chromium/config/Chrome/linux/ \
 		${WRKSRC}/third_party/ffmpeg/chromium/config/Chrome/freebsd
+	# Apply ungoogled-chromium changes here.
+	@${ECHO_MSG} "Pruning binaries"
+	@${PYTHON_CMD} \
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/prune_binaries.py ${WRKSRC} \
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/pruning.list
+	@${ECHO_MSG} "Applying patches"
+	@${PYTHON_CMD} \
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/patches.py apply ${WRKSRC} \
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/patches
+	@${ECHO_MSG} "Applying domain substitution"
+	@${PYTHON_CMD} \
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/domain_substitution.py apply \
+		-r ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/domain_regex.list \
+		-f ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/domain_substitution.list \
+		-c ${WRKDIR}/domainsubcache.tar.gz ${WRKSRC}
 
 do-configure:
 	# GN generator bootstrapping and generating ninja files
