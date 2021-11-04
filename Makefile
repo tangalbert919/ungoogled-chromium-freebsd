@@ -1,20 +1,20 @@
 # Created by: Florent Thoumie <flz@FreeBSD.org>
 # $FreeBSD: head/www/chromium/Makefile 504582 2019-06-19 17:25:17Z cpm $
 
-PORTNAME=	ungoogled-chromium
+PORTNAME=	chromium
 PORTVERSION=	94.0.4606.81
 PORTREVISION=	1
 
-USE_GITHUB=     yes
-GH_TUPLE=       Eloston:ungoogled-chromium:832f064:ungoogled-chromium \
-	        freebsd:chromium:ee38391:freebsd-chromium
+#USE_GITHUB=     yes
+#GH_TUPLE=       Eloston:ungoogled-chromium:832f064:ungoogled_chromium \
+	        freebsd:chromium:ee38391:freebsd_chromium
 
 CATEGORIES=	www
-MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:1 \
-		LOCAL/cpm/chromium/:fonts \
-        	GH/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:2 \
-                GHC/freebsd/chromium/tar.gz/:3
-DISTFILES=	chromium-${PORTVERSION}${EXTRACT_SUFX}:1
+MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:DEFAULT \
+#		LOCAL/rene/chromium/:fonts
+		GH/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled
+DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT ungoogled-chromium.tar.gz:ungoogled
+NO_CHECKSUM=yes
 
 # TODO: Change this.
 MAINTAINER?=	chromium@FreeBSD.org

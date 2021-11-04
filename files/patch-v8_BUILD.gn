@@ -1,0 +1,27 @@
+--- v8/BUILD.gn.orig	2021-09-24 04:28:21 UTC
++++ v8/BUILD.gn
+@@ -4804,9 +4804,15 @@ v8_component("v8_libbase") {
+     }
+   }
+ 
+-  if (is_linux || is_chromeos) {
++  if (is_bsd) {
+     sources += [
+       "src/base/debug/stack_trace_posix.cc",
++      "src/base/platform/platform-freebsd.cc",
++    ]
++    libs = [ "rt", "execinfo" ]
++  } else if (is_linux || is_chromeos) {
++    sources += [
++      "src/base/debug/stack_trace_posix.cc",
+       "src/base/platform/platform-linux.cc",
+     ]
+ 
+@@ -5361,6 +5367,7 @@ if (current_toolchain == v8_generator_toolchain) {
+       "src/interpreter/bytecodes.cc",
+       "src/interpreter/bytecodes.h",
+     ]
++    libs = ["execinfo"]
+ 
+     configs = [ ":internal_config" ]
+ 
