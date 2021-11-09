@@ -12,11 +12,11 @@ Instructions are not available yet.
 
 ### Hardware Requirements
 
-* A 64-bit system is required, and 8 GB of RAM is highly recommended.
+* A 64-bit system is required, and 16 GB of RAM is highly recommended.
 
 ## Developer info
 
-TODO
+* Some ungoogled-chromium patches conflict with the FreeBSD patches. This may have to be fixed on ungoogled-chromium's side, as FreeBSD has over 1000 patches just to add BSD support.
 
 ## License
 
