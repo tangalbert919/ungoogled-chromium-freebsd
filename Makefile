@@ -5,13 +5,8 @@ PORTNAME=	chromium
 PORTVERSION=	94.0.4606.81
 PORTREVISION=	1
 
-#USE_GITHUB=     yes
-#GH_TUPLE=       Eloston:ungoogled-chromium:832f064:ungoogled_chromium \
-	        freebsd:chromium:ee38391:freebsd_chromium
-
 CATEGORIES=	www
 MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:DEFAULT \
-#		LOCAL/rene/chromium/:fonts
 		GH/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled
 DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT ungoogled-chromium.tar.gz:ungoogled
 NO_CHECKSUM=yes
