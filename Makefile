@@ -1,14 +1,16 @@
 # Created by: Florent Thoumie <flz@FreeBSD.org>
-# $FreeBSD: head/www/chromium/Makefile 504582 2019-06-19 17:25:17Z cpm $
 
 PORTNAME=	chromium
-PORTVERSION=	94.0.4606.81
+PORTVERSION=	98.0.4758.102
 PORTREVISION=	1
+FREEBSD_HASH=	0babada855b571cf2328b81b8f938909cb67d760
 
 CATEGORIES=	www
 MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:DEFAULT \
-		GH/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled
-DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT ungoogled-chromium.tar.gz:ungoogled
+		GH/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled \
+		GH/freebsd/chromium/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
+		LOCAL/rene/chromium/:fonts
+DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT ungoogled-chromium.tar.gz:ungoogled freebsd-patches.tar.gz:freebsd
 NO_CHECKSUM=yes
 
 # TODO: Change this.
@@ -18,11 +20,12 @@ COMMENT?=	Google web browser based on WebKit
 LICENSE=	BSD3CLAUSE LGPL21 MPL11
 LICENSE_COMB=	multi
 
+ONLY_FOR_ARCHS=			aarch64 amd64 i386
+
 BUILD_DEPENDS=	bash:shells/bash \
 		${PYTHON_PKGNAMEPREFIX}Jinja2>0:devel/py-Jinja2@${PY_FLAVOR} \
 		${PYTHON_PKGNAMEPREFIX}ply>0:devel/py-ply@${PY_FLAVOR} \
 		gperf:devel/gperf \
-		ffmpeg>=3.2.2,1:multimedia/ffmpeg \
 		flock:sysutils/flock \
 		node:www/node \
 		xcb-proto>0:x11/xcb-proto \
@@ -32,6 +35,7 @@ BUILD_DEPENDS=	bash:shells/bash \
 		${PYTHON_PKGNAMEPREFIX}html5lib>0:www/py-html5lib@${PY_FLAVOR} \
 		${LOCALBASE}/include/va/va.h:multimedia/libva \
 		${LOCALBASE}/bin/python2.7:lang/python27 \
+		${LOCALBASE}/libdata/pkgconfig/dri.pc:graphics/mesa-dri \
 		patch>0:devel/patch
 
 LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
@@ -53,7 +57,6 @@ LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
 		libexif.so:graphics/libexif \
 		libpng.so:graphics/png \
 		libwebp.so:graphics/webp \
-		libavcodec.so:multimedia/ffmpeg \
 		libopenh264.so:multimedia/openh264 \
 		libfreetype.so:print/freetype2 \
 		libharfbuzz.so:print/harfbuzz \
@@ -69,29 +72,25 @@ LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
 RUN_DEPENDS=	xdg-open:devel/xdg-utils \
 		noto-basic>0:x11-fonts/noto-basic
 
-ONLY_FOR_ARCHS=			aarch64 amd64 i386
-
 USES=		bison compiler:c++17-lang cpe desktop-file-utils dos2unix gl gnome jpeg localbase:ldflags  \
 		ninja perl5 pkgconfig python:3.6-3.9,build shebangfix tar:xz xorg
 
-MAKE_ARGS=	-C out/${BUILDTYPE}
-BINARY_ALIAS=	python=${LOCALBASE}/bin/python2.7 \
-		python3=${PYTHON_CMD}
-DOS2UNIX_FILES=	third_party/skia/third_party/vulkanmemoryallocator/include/vk_mem_alloc.h
-
 CPE_VENDOR=	google
 CPE_PRODUCT=	chrome
+DOS2UNIX_FILES=	third_party/skia/third_party/vulkanmemoryallocator/include/vk_mem_alloc.h
 USE_GL=		gbm gl
+USE_GNOME=	atk dconf gdkpixbuf2 glib20 gtk30 libxml2 libxslt
 USE_LDCONFIG=	${DATADIR}
 USE_PERL5=	build
 USE_XORG=	x11 xcb xcomposite xcursor xext xdamage xfixes xi \
 		xorgproto xrandr xrender xscrnsaver xtst
-USE_GNOME=	atk dconf gdkpixbuf2 glib20 gtk30 libxml2 libxslt
 SHEBANG_FILES=	chrome/tools/build/linux/chrome-wrapper buildtools/linux64/clang-format
-ALL_TARGET=	chrome
-INSTALLS_ICONS=	yes
 
-EXTRA_PATCHES+=	${FILESDIR}/extra-patch-clang
+MAKE_ARGS=	-C out/${BUILDTYPE}
+ALL_TARGET=	chrome
+
+BINARY_ALIAS=	python=${LOCALBASE}/bin/python2.7 \
+		python3=${PYTHON_CMD}
 
 # TODO bz@ : install libwidevinecdm.so (see third_party/widevine/cdm/BUILD.gn)
 #
@@ -105,6 +104,8 @@ GN_ARGS+=	clang_use_chrome_plugins=false \
 		enable_nacl=false \
 		enable_one_click_signin=true \
 		enable_remoting=false \
+		enable_wmax_tokens=false \
+		fatal_linker_warnings=false \
 		is_clang=true \
 		optimize_webui=false \
 		toolkit_views=true \
@@ -119,8 +120,10 @@ GN_ARGS+=	clang_use_chrome_plugins=false \
 		use_system_freetype=false \
 		use_system_harfbuzz=true \
 		use_system_libjpeg=true \
+		use_udev=false \
 		extra_cxxflags="${CXXFLAGS}" \
 		extra_ldflags="${LDFLAGS}"
+
 # TODO: investigate building with these options:
 # use_system_minigbm
 GN_BOOTSTRAP_FLAGS=	--no-clean --no-rebuild --skip-generate-buildfiles
@@ -201,25 +204,18 @@ SNDIO_VARS=		GN_ARGS+=use_sndio=true
 SNDIO_VARS_OFF=		GN_ARGS+=use_sndio=false
 
 .include "Makefile.tests"
-TEST_ALL_TARGET=	${TEST_TARGETS}
 TEST_DISTFILES=		${PORTNAME}-${DISTVERSION}-testdata${EXTRACT_SUFX} \
-			test_fonts${EXTRACT_SUFX}:fonts
+			test_fonts-85${EXTRACT_SUFX}:fonts
+TEST_ALL_TARGET=	${TEST_TARGETS}
 
 .include <bsd.port.options.mk>
 .include <bsd.port.pre.mk>
-
-# Add extra-patch-no-mempcpy-nasm only when there's no mempcpy() in base.
-# Nested variable expansion avoids executing the test when not needed for
-# expanding EXTRA_PATCHES.
-EXTRA_PATCHES+=	${"${:!${GREP} mempcpy ${CROSS_SYSROOT}/usr/include/string.h \
-	|| ${TRUE}!}" == "":?${PATCHDIR}/extra-patch-no-mempcpy-nasm:}
 
 .if ${PORT_OPTIONS:MHEIMDAL_BASE} && !exists(/usr/lib/libkrb5.so)
 IGNORE=		you have selected HEIMDAL_BASE but do not have Heimdal installed in base
 .endif
 
 .if ${COMPILER_VERSION} < 120
-EXTRA_PATCHES+=	${PATCHDIR}/extra-patch-build_config_compiler_pgo_pgo.gni
 
 .if ${PORT_OPTIONS:MLTO}
 BROKEN+=	does not build with LTO needs LLVM 12+
@@ -251,20 +247,6 @@ post-extract-TEST-on:
 	@${MKDIR} ${WRKSRC}/third_party/test_fonts/test_fonts
 	@${MV} ${WRKDIR}/test_fonts ${WRKSRC}/third_party/test_fonts/
 
-post-patch:
-	@${MKDIR} ${WRKSRC}/sandbox/policy/freebsd
-	@${CP} ${FILESDIR}/dir_reader_freebsd.h ${WRKSRC}/base/files
-	@${CP} ${FILESDIR}/device_info_fetcher_freebsd.h ${WRKSRC}/chrome/browser/enterprise/signals
-	@${CP} ${FILESDIR}/device_info_fetcher_freebsd.cc ${WRKSRC}/chrome/browser/enterprise/signals
-	@${CP} ${FILESDIR}/sandbox_freebsd.h ${WRKSRC}/sandbox/policy/freebsd
-	@${CP} ${FILESDIR}/sandbox_freebsd.cc ${WRKSRC}/sandbox/policy/freebsd
-
-post-patch-SNDIO-on:
-	@${MKDIR} ${WRKSRC}/media/audio/sndio ${WRKSRC}/media/audio/openbsd
-	@${CP} ${FILESDIR}/sndio_output.* ${WRKSRC}/media/audio/sndio
-	@${CP} ${FILESDIR}/sndio_input.* ${WRKSRC}/media/audio/sndio
-	@${CP} ${FILESDIR}/audio_manager_openbsd.* ${WRKSRC}/media/audio/openbsd
-
 pre-configure:
 	# We used to remove bundled libraries to be sure that chromium uses
 	# system libraries and not shipped ones.
@@ -272,11 +254,13 @@ pre-configure:
 	#./build/linux/unbundle/remove_bundled_libraries.py [list of preserved]
 	cd ${WRKSRC} && ${SETENV} ${CONFIGURE_ENV} ${PYTHON_CMD} \
 		./build/linux/unbundle/replace_gn_files.py --system-libraries \
-		flac fontconfig freetype harfbuzz-ng libdrm libpng libwebp libxml libxslt openh264 opus snappy || ${FALSE}
+		flac fontconfig freetype harfbuzz-ng libusb libdrm libpng libwebp libxml libxslt openh264 opus snappy || ${FALSE}
 	# Chromium uses an unreleased version of FFmpeg, so configure it
+.for brand in Chrome Chromium
 	${CP} -R \
 		${WRKSRC}/third_party/ffmpeg/chromium/config/Chrome/linux/ \
 		${WRKSRC}/third_party/ffmpeg/chromium/config/Chrome/freebsd
+.endfor
 	# Apply ungoogled-chromium changes here.
 	@${ECHO_MSG} "Pruning binaries"
 	@${PYTHON_CMD} \
@@ -304,19 +288,13 @@ do-configure:
 
 	# Setup nodejs dependency
 	@${MKDIR} ${WRKSRC}/third_party/node/freebsd/node-freebsd-x64/bin
-	${LN} -sf ${LOCALBASE}/bin/node ${WRKSRC}/third_party/node/freebsd/node-freebsd-x64/bin/node
+	${LN} -sf ${LOCALBASE}/bin/node ${WRKSRC}/third_party/node/freebsd/node-freebsd/bin/node
 
 	# Setup buildtools/freebsd
 	@${MKDIR} ${WRKSRC}/buildtools/freebsd
 	${LN} -sf ${WRKSRC}/buildtools/linux64/clang-format ${WRKSRC}/buildtools/freebsd
 	${LN} -sf ${WRKSRC}/out/${BUILDTYPE}/gn ${WRKSRC}/buildtools/freebsd
 	${LN} -sf /usr/bin/strip ${WRKSRC}/buildtools/freebsd/strip
-
-do-test-TEST-on:
-.for t in ${TEST_TARGETS}
-	cd ${WRKSRC}/out/${BUILDTYPE} && ${SETENV} LC_ALL=en_US.UTF-8 \
-		./${t} --gtest_filter=-${EXCLUDE_${t}:ts:} || ${TRUE}
-.endfor
 
 do-install:
 	@${MKDIR} ${STAGEDIR}${DATADIR}
@@ -373,8 +351,14 @@ post-install-DEBUG-on:
 		${STAGEDIR}${DATADIR}
 
 post-install-DRIVER-on:
-	${INSTALL_PROGRAM} ${WRKSRC}/out/${BUILDTYPE}/chromedriver \
-		${STAGEDIR}${PREFIX}/bin
+	${INSTALL_PROGRAM} ${WRKSRC}/out/${BUILDTYPE}/chromedriver.unstripped \
+		${STAGEDIR}${PREFIX}/bin/chromedriver
 .endif
 
-.include <bsd.port.mk>
+do-test-TEST-on:
+.for t in ${TEST_TARGETS}
+	cd ${WRKSRC}/out/${BUILDTYPE} && ${SETENV} LC_ALL=en_US.UTF-8 \
+		./${t} --gtest_filter=-${EXCLUDE_${t}:ts:} || ${TRUE}
+.endfor
+
+.include <bsd.port.post.mk>
