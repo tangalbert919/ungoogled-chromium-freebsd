@@ -3,6 +3,8 @@
 PORTNAME=	chromium
 PORTVERSION=	98.0.4758.102
 PORTREVISION=	1
+# Set this to the latest commit whichever branch of FreeBSD's Chromium repository we are building.
+# Example: If building Chromium 98, use hash of latest commit in branch v98.
 FREEBSD_HASH=	0babada855b571cf2328b81b8f938909cb67d760
 
 CATEGORIES=	www
