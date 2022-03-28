@@ -252,6 +252,9 @@ pre-everything::
 	@${ECHO_MSG} "and ${WANTSPACE}."
 	@${ECHO_MSG}
 
+pre-patch:
+	${CP} -r ${WRKDIR}/chromium-${FREEBSD_HASH}/www/chromium/files .
+
 post-extract-TEST-on:
 	@${MKDIR} ${WRKSRC}/third_party/test_fonts/test_fonts
 	@${MV} ${WRKDIR}/test_fonts ${WRKSRC}/third_party/test_fonts/
