@@ -8,10 +8,15 @@ PORTREVISION=	1
 FREEBSD_HASH=	0babada855b571cf2328b81b8f938909cb67d760
 
 CATEGORIES=	www
+
+#USE_GITHUB=	nodefault
+#GH_TUPLE=	Eloston:ungoogled-chromium:${PORTVERSION}-${PORTREVISION}:ungoogled \
+#		freebsd:chromium:${FREEBSD_HASH}:patches
 MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:DEFAULT \
-		GH/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled \
-		GH/freebsd/chromium/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
+		https://codeload.github.com/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled \
+		https://codeload.github.com/freebsd/chromium/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
 		LOCAL/rene/chromium/:fonts
+#DISTFILES=	${DISTNAME}${EXTRACT_SUFX}
 DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT ungoogled-chromium.tar.gz:ungoogled freebsd-patches.tar.gz:freebsd
 NO_CHECKSUM=yes
 
