@@ -108,18 +108,11 @@ BINARY_ALIAS=	python=${LOCALBASE}/bin/python2.7 \
 # Some parts don't have use_system_* flag, and can be turned on/off by using
 # replace_gn_files.py script, some parts just turned on/off for target host
 # OS "target_os == is_bsd", like libusb, libpci.
-GN_ARGS+=	clang_use_chrome_plugins=false \
-		enable_hangout_services_extension=true \
-		enable_js_type_check=false \
-		enable_nacl=false \
-		enable_one_click_signin=true \
-		enable_remoting=false \
-		enable_wmax_tokens=false \
+GN_ARGS+=	enable_wmax_tokens=false \
 		fatal_linker_warnings=false \
 		is_clang=true \
 		optimize_webui=false \
 		toolkit_views=true \
-		treat_warnings_as_errors=false \
 		use_allocator="none" \
 		use_allocator_shim=false \
 		use_aura=true \
@@ -143,6 +136,9 @@ GN_BOOTSTRAP_FLAGS=	--no-clean --no-rebuild --skip-generate-buildfiles
 # Note: these are for FreeBSD use ONLY. For your own distribution,
 # please get your own set of keys.
 GN_ARGS+=	google_api_key="AIzaSyBsp9n41JLW8jCokwn7vhoaMejDFRd1mp8"
+
+# Ungoogled-chromium GN file
+GN_FILE=	${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/flags.gn
 
 SUB_FILES=	chromium-browser.desktop chrome
 SUB_LIST+=	COMMENT="${COMMENT}"
@@ -293,7 +289,7 @@ do-configure:
 		READELF=${READELF} AR=${AR} NM=${NM} ${PYTHON_CMD} \
 		./tools/gn/bootstrap/bootstrap.py ${GN_BOOTSTRAP_FLAGS}
 	cd ${WRKSRC} && ${SETENV} ${CONFIGURE_ENV} ./out/${BUILDTYPE}/gn \
-		gen --args='${GN_ARGS}' out/${BUILDTYPE}
+		gen --args='import("${GN_FILE}") ${GN_ARGS}' out/${BUILDTYPE}
 
 	# Setup nodejs dependency
 	@${MKDIR} ${WRKSRC}/third_party/node/freebsd/node-freebsd-x64/bin
