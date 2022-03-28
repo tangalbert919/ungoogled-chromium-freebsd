@@ -17,7 +17,9 @@ MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official
 		https://codeload.github.com/freebsd/chromium/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
 		LOCAL/rene/chromium/:fonts
 #DISTFILES=	${DISTNAME}${EXTRACT_SUFX}
-DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT ungoogled-chromium.tar.gz:ungoogled freebsd-patches.tar.gz:freebsd
+DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT \
+		ungoogled-chromium-${PORTVERSION}-${PORTREVISION}.tar.gz:ungoogled \
+		freebsd-patches-${PORTVERSION}.tar.gz:freebsd
 NO_CHECKSUM=yes
 
 # TODO: Change this.
