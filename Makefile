@@ -21,6 +21,7 @@ DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT \
 		ungoogled-chromium-${PORTVERSION}-${PORTREVISION}.tar.gz:ungoogled \
 		freebsd-patches-${PORTVERSION}.tar.gz:freebsd
 NO_CHECKSUM=yes
+PATCHDIR=	${WRKDIR}/chromium-${FREEBSD_HASH}/www/chromium/files
 
 # TODO: Change this.
 MAINTAINER?=	chromium@FreeBSD.org
@@ -252,9 +253,6 @@ pre-everything::
 	@${ECHO_MSG} "and ${WANTSPACE}."
 	@${ECHO_MSG}
 
-pre-patch:
-	${CP} -r ${WRKDIR}/chromium-${FREEBSD_HASH}/www/chromium/files .
-
 post-extract-TEST-on:
 	@${MKDIR} ${WRKSRC}/third_party/test_fonts/test_fonts
 	@${MV} ${WRKDIR}/test_fonts ${WRKSRC}/third_party/test_fonts/
@@ -281,8 +279,7 @@ pre-configure:
 	@${ECHO_MSG} "Applying patches"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/patches.py apply ${WRKSRC} \
-		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/patches \
-		--patch-bin /usr/local/bin/gpatch
+		./patches --patch-bin /usr/local/bin/gpatch
 	@${ECHO_MSG} "Applying domain substitution"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/domain_substitution.py apply \
