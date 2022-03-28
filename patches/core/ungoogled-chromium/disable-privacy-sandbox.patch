@@ -1,0 +1,53 @@
+--- a/chrome/browser/privacy_sandbox/privacy_sandbox_settings.cc
++++ b/chrome/browser/privacy_sandbox/privacy_sandbox_settings.cc
+@@ -369,7 +369,7 @@ std::vector<GURL> PrivacySandboxSettings
+ }
+ 
+ bool PrivacySandboxSettings::IsPrivacySandboxAllowed() {
+-  return pref_service_->GetBoolean(prefs::kPrivacySandboxApisEnabled);
++  return false;
+ }
+ 
+ bool PrivacySandboxSettings::IsPrivacySandboxEnabled() {
+@@ -381,8 +381,6 @@ bool PrivacySandboxSettings::IsPrivacySa
+ }
+ 
+ void PrivacySandboxSettings::SetPrivacySandboxEnabled(bool enabled) {
+-  pref_service_->SetBoolean(prefs::kPrivacySandboxManuallyControlled, true);
+-  pref_service_->SetBoolean(prefs::kPrivacySandboxApisEnabled, enabled);
+ }
+ 
+ void PrivacySandboxSettings::OnCookiesCleared() {
+--- a/chrome/browser/resources/settings/privacy_page/privacy_page.html
++++ b/chrome/browser/resources/settings/privacy_page/privacy_page.html
+@@ -80,19 +80,6 @@
+             sub-label="$i18n{permissionsPageDescription}"
+             on-click="onPermissionsPageClick_"
+             role-description="$i18n{subpageArrowRoleDescription}"></cr-link-row>
+-        <cr-link-row id="privacySandboxLinkRow"
+-            start-icon="settings20:experiment"
+-            class="hr"
+-            label="$i18n{privacySandboxTitle}"
+-            sub-label="[[computePrivacySandboxSublabel_(
+-                prefs.privacy_sandbox.apis_enabled.*)]]"
+-            on-click="onPrivacySandboxClick_"
+-            external
+-            role-description="$i18n{subpageArrowRoleDescription}">
+-        </cr-link-row>
+-        <a id="privacySandboxLink" href="privacySandbox"
+-            target="_blank" tabindex="-1" aria-disabled="true"
+-            role="none"></a>
+       </div>
+ 
+ <if expr="use_nss_certs">
+--- a/components/privacy_sandbox/privacy_sandbox_prefs.cc
++++ b/components/privacy_sandbox/privacy_sandbox_prefs.cc
+@@ -31,7 +31,7 @@ namespace privacy_sandbox {
+ 
+ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
+   registry->RegisterBooleanPref(
+-      prefs::kPrivacySandboxApisEnabled, true,
++      prefs::kPrivacySandboxApisEnabled, false,
+       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+   registry->RegisterBooleanPref(
+       prefs::kPrivacySandboxManuallyControlled, false,

@@ -1,0 +1,296 @@
+# Disables file download quarantining
+
+--- a/components/download/internal/common/base_file.cc
++++ b/components/download/internal/common/base_file.cc
+@@ -22,7 +22,6 @@
+ #include "components/download/public/common/download_interrupt_reasons_utils.h"
+ #include "components/download/public/common/download_item.h"
+ #include "components/download/public/common/download_stats.h"
+-#include "components/services/quarantine/quarantine.h"
+ #include "crypto/secure_hash.h"
+ 
+ #if defined(OS_WIN)
+@@ -529,105 +528,6 @@ DownloadInterruptReason BaseFile::Publis
+ }
+ #endif  // defined(OS_ANDROID)
+ 
+-namespace {
+-
+-DownloadInterruptReason QuarantineFileResultToReason(
+-    quarantine::mojom::QuarantineFileResult result) {
+-  switch (result) {
+-    case quarantine::mojom::QuarantineFileResult::OK:
+-      return DOWNLOAD_INTERRUPT_REASON_NONE;
+-    case quarantine::mojom::QuarantineFileResult::VIRUS_INFECTED:
+-      return DOWNLOAD_INTERRUPT_REASON_FILE_VIRUS_INFECTED;
+-    case quarantine::mojom::QuarantineFileResult::SECURITY_CHECK_FAILED:
+-      return DOWNLOAD_INTERRUPT_REASON_FILE_SECURITY_CHECK_FAILED;
+-    case quarantine::mojom::QuarantineFileResult::BLOCKED_BY_POLICY:
+-      return DOWNLOAD_INTERRUPT_REASON_FILE_BLOCKED;
+-    case quarantine::mojom::QuarantineFileResult::ACCESS_DENIED:
+-      return DOWNLOAD_INTERRUPT_REASON_FILE_ACCESS_DENIED;
+-
+-    case quarantine::mojom::QuarantineFileResult::FILE_MISSING:
+-      // Don't have a good interrupt reason here. This return code means that
+-      // the file at |full_path_| went missing before QuarantineFile got to
+-      // look at it. Not expected to happen, but we've seen instances where a
+-      // file goes missing immediately after BaseFile closes the handle.
+-      //
+-      // Intentionally using a different error message than
+-      // SECURITY_CHECK_FAILED in order to distinguish the two.
+-      return DOWNLOAD_INTERRUPT_REASON_FILE_FAILED;
+-
+-    case quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED:
+-      // This means that the mark-of-the-web couldn't be applied. The file is
+-      // already on the file system under its final target name.
+-      //
+-      // Causes of failed annotations typically aren't transient. E.g. the
+-      // target file system may not support extended attributes or alternate
+-      // streams. We are going to allow these downloads to progress on the
+-      // assumption that failures to apply MOTW can't reliably be introduced
+-      // remotely.
+-      return DOWNLOAD_INTERRUPT_REASON_NONE;
+-  }
+-  return DOWNLOAD_INTERRUPT_REASON_FILE_FAILED;
+-}
+-
+-// Given a source and a referrer, determines the "safest" URL that can be used
+-// to determine the authority of the download source. Returns an empty URL if no
+-// HTTP/S URL can be determined for the <|source_url|, |referrer_url|> pair.
+-GURL GetEffectiveAuthorityURL(const GURL& source_url,
+-                              const GURL& referrer_url) {
+-  if (source_url.is_valid()) {
+-    // http{,s} has an authority and are supported.
+-    if (source_url.SchemeIsHTTPOrHTTPS())
+-      return source_url;
+-
+-    // If the download source is file:// ideally we should copy the MOTW from
+-    // the original file, but given that Chrome/Chromium places strict
+-    // restrictions on which schemes can reference file:// URLs, this code is
+-    // going to assume that at this point it's okay to treat this download as
+-    // being from the local system.
+-    if (source_url.SchemeIsFile())
+-      return source_url;
+-
+-    // ftp:// has an authority.
+-    if (source_url.SchemeIs(url::kFtpScheme))
+-      return source_url;
+-
+-    if (source_url.SchemeIs(url::kBlobScheme))
+-      return url::Origin::Create(source_url).GetURL();
+-  }
+-
+-  if (referrer_url.is_valid() && referrer_url.SchemeIsHTTPOrHTTPS())
+-    return referrer_url;
+-
+-  return GURL();
+-}
+-
+-}  // namespace
+-
+-void BaseFile::OnFileQuarantined(
+-    bool connection_error,
+-    quarantine::mojom::QuarantineFileResult result) {
+-  base::UmaHistogramBoolean("Download.QuarantineService.ConnectionError",
+-                            connection_error);
+-
+-  DCHECK(on_annotation_done_callback_);
+-  quarantine_service_.reset();
+-  std::move(on_annotation_done_callback_)
+-      .Run(QuarantineFileResultToReason(result));
+-}
+-
+-void BaseFile::OnQuarantineServiceError(const GURL& source_url,
+-                                        const GURL& referrer_url) {
+-#if defined(OS_WIN)
+-  if (base::FeatureList::IsEnabled(quarantine::kOutOfProcessQuarantine)) {
+-    OnFileQuarantined(/*connection_error=*/true,
+-                      quarantine::SetInternetZoneIdentifierDirectly(
+-                          full_path_, source_url, referrer_url));
+-    return;
+-  }
+-#endif  // defined(OS_WIN)
+-
+-  CHECK(false) << "In-process quarantine service should not have failed.";
+-}
+ 
+ void BaseFile::AnnotateWithSourceInformation(
+     const std::string& client_guid,
+@@ -635,32 +535,8 @@ void BaseFile::AnnotateWithSourceInforma
+     const GURL& referrer_url,
+     mojo::PendingRemote<quarantine::mojom::Quarantine> remote_quarantine,
+     OnAnnotationDoneCallback on_annotation_done_callback) {
+-  GURL authority_url = GetEffectiveAuthorityURL(source_url, referrer_url);
+-  if (!remote_quarantine) {
+-#if defined(OS_WIN)
+-    quarantine::mojom::QuarantineFileResult result =
+-        quarantine::SetInternetZoneIdentifierDirectly(full_path_, authority_url,
+-                                                      referrer_url);
+-#else
+-    quarantine::mojom::QuarantineFileResult result =
+-        quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED;
+-#endif
+-    std::move(on_annotation_done_callback)
+-        .Run(QuarantineFileResultToReason(result));
+-  } else {
+-    quarantine_service_.Bind(std::move(remote_quarantine));
+-
+-    on_annotation_done_callback_ = std::move(on_annotation_done_callback);
+-
+-    quarantine_service_.set_disconnect_handler(base::BindOnce(
+-        &BaseFile::OnQuarantineServiceError, weak_factory_.GetWeakPtr(),
+-        authority_url, referrer_url));
+-
+-    quarantine_service_->QuarantineFile(
+-        full_path_, authority_url, referrer_url, client_guid,
+-        base::BindOnce(&BaseFile::OnFileQuarantined, weak_factory_.GetWeakPtr(),
+-                       false));
+-  }
++  std::move(on_annotation_done_callback)
++      .Run(DOWNLOAD_INTERRUPT_REASON_NONE);
+ }
+ 
+ }  // namespace download
+--- a/content/browser/BUILD.gn
++++ b/content/browser/BUILD.gn
+@@ -83,7 +83,6 @@ source_set("browser") {
+     "//components/permissions:permissions_common",
+     "//components/power_scheduler",
+     "//components/services/filesystem:lib",
+-    "//components/services/quarantine:quarantine",
+     "//components/services/storage",
+     "//components/services/storage:filesystem_proxy_factory",
+     "//components/services/storage/dom_storage:local_storage_proto",
+--- a/content/browser/file_system_access/safe_move_helper.cc
++++ b/content/browser/file_system_access/safe_move_helper.cc
+@@ -13,7 +13,6 @@
+ #include "base/threading/sequenced_task_runner_handle.h"
+ #include "build/build_config.h"
+ #include "build/chromeos_buildflags.h"
+-#include "components/services/quarantine/quarantine.h"
+ #include "content/browser/file_system_access/file_system_access_error.h"
+ #include "content/public/browser/content_browser_client.h"
+ #include "content/public/common/content_client.h"
+@@ -194,20 +193,8 @@ void SafeMoveHelper::DidAfterWriteCheck(
+   // not exist anymore. In case of error, the source file URL will point to a
+   // valid filesystem location.
+   base::OnceCallback<void(base::File::Error)> result_callback;
+-  if (RequireSecurityChecks()) {
+-    GURL referrer_url = manager_->is_off_the_record() ? GURL() : context_.url;
+-    mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote;
+-    if (quarantine_connection_callback_) {
+-      quarantine_connection_callback_.Run(
+-          quarantine_remote.BindNewPipeAndPassReceiver());
+-    }
+-    result_callback = base::BindOnce(
+-        &SafeMoveHelper::DidFileDoQuarantine, weak_factory_.GetWeakPtr(),
+-        dest_url(), referrer_url, std::move(quarantine_remote));
+-  } else {
+     result_callback = base::BindOnce(&SafeMoveHelper::DidFileSkipQuarantine,
+                                      weak_factory_.GetWeakPtr());
+-  }
+   manager_->DoFileSystemOperation(
+       FROM_HERE, &storage::FileSystemOperationRunner::Move,
+       std::move(result_callback), source_url(), dest_url(), options_,
+@@ -223,7 +210,6 @@ void SafeMoveHelper::DidFileSkipQuaranti
+ void SafeMoveHelper::DidFileDoQuarantine(
+     const storage::FileSystemURL& target_url,
+     const GURL& referrer_url,
+-    mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote,
+     base::File::Error result) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+ 
+@@ -254,37 +240,9 @@ void SafeMoveHelper::DidFileDoQuarantine
+       referrer_url.is_valid() && referrer_url.SchemeIsHTTPOrHTTPS()
+           ? referrer_url
+           : GURL();
+-
+-  if (quarantine_remote) {
+-    quarantine::mojom::Quarantine* raw_quarantine = quarantine_remote.get();
+-    raw_quarantine->QuarantineFile(
+-        target_url.path(), authority_url, referrer_url,
+-        GetContentClient()
+-            ->browser()
+-            ->GetApplicationClientGUIDForQuarantineCheck(),
+-        mojo::WrapCallbackWithDefaultInvokeIfNotRun(
+-            base::BindOnce(&SafeMoveHelper::DidAnnotateFile,
+-                           weak_factory_.GetWeakPtr(),
+-                           std::move(quarantine_remote)),
+-            quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED));
+-  } else {
+-#if defined(OS_WIN)
+-    base::ThreadPool::PostTaskAndReplyWithResult(
+-        FROM_HERE, {base::MayBlock()},
+-        base::BindOnce(&quarantine::SetInternetZoneIdentifierDirectly,
+-                       target_url.path(), authority_url, referrer_url),
+-        base::BindOnce(&SafeMoveHelper::DidAnnotateFile,
+-                       weak_factory_.GetWeakPtr(),
+-                       std::move(quarantine_remote)));
+-#else
+-    DidAnnotateFile(std::move(quarantine_remote),
+-                    quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED);
+-#endif
+-  }
+ }
+ 
+ void SafeMoveHelper::DidAnnotateFile(
+-    mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote,
+     quarantine::mojom::QuarantineFileResult result) {
+   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+ 
+--- a/content/browser/file_system_access/safe_move_helper.h
++++ b/content/browser/file_system_access/safe_move_helper.h
+@@ -58,10 +58,8 @@ class CONTENT_EXPORT SafeMoveHelper {
+   void DidFileDoQuarantine(
+       const storage::FileSystemURL& target_url,
+       const GURL& referrer_url,
+-      mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote,
+       base::File::Error result);
+   void DidAnnotateFile(
+-      mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote,
+       quarantine::mojom::QuarantineFileResult result);
+ 
+   void ComputeHashForSourceFile(HashCallback callback);
+--- a/content/browser/renderer_host/pepper/pepper_file_io_host.cc
++++ b/content/browser/renderer_host/pepper/pepper_file_io_host.cc
+@@ -456,7 +456,7 @@ void PepperFileIOHost::OnLocalFileOpened
+     ppapi::host::ReplyMessageContext reply_context,
+     const base::FilePath& path,
+     base::File::Error error_code) {
+-#if defined(OS_WIN) || defined(OS_LINUX) || defined(OS_CHROMEOS) || defined(OS_BSD)
++#if 0
+   // Quarantining a file before its contents are available is only supported on
+   // Windows and Linux.
+   if (!FileOpenForWrite(open_flags_) || error_code != base::File::FILE_OK) {
+@@ -490,7 +490,7 @@ void PepperFileIOHost::OnLocalFileOpened
+ #endif
+ }
+ 
+-#if defined(OS_WIN) || defined(OS_LINUX) || defined(OS_CHROMEOS) || defined(OS_BSD)
++#if 0
+ void PepperFileIOHost::OnLocalFileQuarantined(
+     ppapi::host::ReplyMessageContext reply_context,
+     const base::FilePath& path,
+--- a/content/browser/renderer_host/pepper/pepper_file_io_host.h
++++ b/content/browser/renderer_host/pepper/pepper_file_io_host.h
+@@ -13,7 +13,6 @@
+ #include "base/memory/raw_ptr.h"
+ #include "base/memory/ref_counted.h"
+ #include "base/memory/weak_ptr.h"
+-#include "components/services/quarantine/public/mojom/quarantine.mojom.h"
+ #include "content/browser/renderer_host/pepper/browser_ppapi_host_impl.h"
+ #include "ipc/ipc_listener.h"
+ #include "ipc/ipc_platform_file.h"
+@@ -93,12 +92,6 @@ class PepperFileIOHost : public ppapi::h
+                          const base::FilePath& path,
+                          base::File::Error error_code);
+ 
+-  void OnLocalFileQuarantined(
+-      ppapi::host::ReplyMessageContext reply_context,
+-      const base::FilePath& path,
+-      mojo::Remote<quarantine::mojom::Quarantine> quarantine_remote,
+-      quarantine::mojom::QuarantineFileResult quarantine_result);
+-
+   void SendFileOpenReply(ppapi::host::ReplyMessageContext reply_context,
+                          base::File::Error error_code);
+ 
