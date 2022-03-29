@@ -359,7 +359,7 @@ post-install-DEBUG-on:
 		${STAGEDIR}${DATADIR}
 
 post-install-DRIVER-on:
-	${INSTALL_PROGRAM} ${WRKSRC}/out/${BUILDTYPE}/chromedriver.unstripped \
+	${INSTALL_PROGRAM} ${WRKSRC}/out/${BUILDTYPE}/chromedriver \
 		${STAGEDIR}${PREFIX}/bin/chromedriver
 
 do-test-TEST-on:
