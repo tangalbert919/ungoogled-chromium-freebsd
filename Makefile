@@ -318,7 +318,7 @@ do-install:
 .for d in protoc mksnapshot
 	${INSTALL_PROGRAM} ${WRKSRC}/out/${BUILDTYPE}/${d} ${STAGEDIR}${DATADIR}
 .endfor
-.for d in icudtl.dat snapshpt_blob.bin v8_context_snapshot.bin
+.for d in icudtl.dat snapshot_blob.bin v8_context_snapshot.bin
 	${INSTALL_DATA} ${WRKSRC}/out/${BUILDTYPE}/${d} ${STAGEDIR}${DATADIR}
 .endfor
 	${INSTALL_PROGRAM} ${WRKSRC}/out/${BUILDTYPE}/chrome \
@@ -338,6 +338,7 @@ do-install:
 .endfor
 .if ${BUILDTYPE} == Debug
 	${INSTALL_LIB} ${WRKSRC}/out/${BUILDTYPE}/libVkLayer_khronos_validation.so ${STAGEDIR}${DATADIR}
+.endif
 
 	# SwiftShader
 .if ${ARCH} != aarch64
