@@ -361,7 +361,6 @@ post-install-DEBUG-on:
 post-install-DRIVER-on:
 	${INSTALL_PROGRAM} ${WRKSRC}/out/${BUILDTYPE}/chromedriver.unstripped \
 		${STAGEDIR}${PREFIX}/bin/chromedriver
-.endif
 
 do-test-TEST-on:
 .for t in ${TEST_TARGETS}
