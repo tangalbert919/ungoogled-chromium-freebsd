@@ -267,6 +267,8 @@ pre-configure:
 		${WRKSRC}/third_party/ffmpeg/chromium/config/Chrome/linux/ \
 		${WRKSRC}/third_party/ffmpeg/chromium/config/Chrome/freebsd
 .endfor
+	# Disable widevine, as it is not supported in FreeBSD.
+	sed -i -e 's/enable_widevine=true/enable_widevine=false/' ${GN_FILE}
 	# Apply ungoogled-chromium changes here.
 	@${ECHO_MSG} "Pruning binaries"
 	@${PYTHON_CMD} \
