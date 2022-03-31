@@ -1,6 +1,6 @@
 # Created by: Florent Thoumie <flz@FreeBSD.org>
 
-PORTNAME=	chromium
+PORTNAME=	ungoogled-chromium
 PORTVERSION=	98.0.4758.102
 PORTREVISION=	1
 # Set this to the latest commit whichever branch of FreeBSD's Chromium repository we are building.
@@ -12,16 +12,17 @@ CATEGORIES=	www
 #USE_GITHUB=	nodefault
 #GH_TUPLE=	Eloston:ungoogled-chromium:${PORTVERSION}-${PORTREVISION}:ungoogled \
 #		freebsd:chromium:${FREEBSD_HASH}:patches
-MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:DEFAULT \
+MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:chromium \
 		https://codeload.github.com/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled \
-		https://codeload.github.com/freebsd/chromium/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
+		https://codeload.github.com/freebsd/freebsd-ports/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
 		LOCAL/rene/chromium/:fonts
 #DISTFILES=	${DISTNAME}${EXTRACT_SUFX}
-DISTFILES=	${DISTNAME}${EXTRACT_SUFX}:DEFAULT \
+DISTFILES=	chromium-${PORTVERSION}${EXTRACT_SUFX}:chromium \
 		ungoogled-chromium-${PORTVERSION}-${PORTREVISION}.tar.gz:ungoogled \
 		freebsd-patches-${PORTVERSION}.tar.gz:freebsd
 NO_CHECKSUM=yes
 PATCHDIR=	${WRKDIR}/chromium-${FREEBSD_HASH}/www/chromium/files
+WRKSRC=		${WRKDIR}/chromium-${PORTVERSION}
 
 # TODO: Change this.
 MAINTAINER?=	chromium@FreeBSD.org
@@ -210,7 +211,7 @@ SNDIO_VARS=		GN_ARGS+=use_sndio=true
 SNDIO_VARS_OFF=		GN_ARGS+=use_sndio=false
 
 .include "Makefile.tests"
-TEST_DISTFILES=		${PORTNAME}-${DISTVERSION}-testdata${EXTRACT_SUFX} \
+TEST_DISTFILES=		chromium-${DISTVERSION}-testdata${EXTRACT_SUFX} \
 			test_fonts-85${EXTRACT_SUFX}:fonts
 TEST_ALL_TARGET=	${TEST_TARGETS}
 
@@ -248,6 +249,11 @@ pre-everything::
 	@${ECHO_MSG} "To build Chromium, you should have around 2GB of memory"
 	@${ECHO_MSG} "and ${WANTSPACE}."
 	@${ECHO_MSG}
+
+#do-extract:
+#	tar -xf ${DISTDIR}/chromium-${PORTVERSION}.tar.xz -C ${WRKDIR}
+#	tar -xf ${DISTDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}.tar.gz -C ${WRKDIR}
+#	tar -xf ${DISTDIR}/freebsd-patches-${PORTVERSION}.tar.gz freebsd-ports-${FREEBSD_HASH}/www/chromium --strip-components=1 -C ${WRKDIR}
 
 post-extract-TEST-on:
 	@${MKDIR} ${WRKSRC}/third_party/test_fonts/test_fonts
