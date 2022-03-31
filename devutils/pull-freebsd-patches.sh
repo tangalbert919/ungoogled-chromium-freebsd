@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script will pull FreeBSD patches.
+# The patches on freebsd/chromium are often behind by a few days, so we will pull
+# from freebsd/freebsd-ports instead.
 FREEBSD_HASH=$(grep 'FREEBSD_HASH=\t*' Makefile | sed 's/FREEBSD_HASH=\t//')
 #echo $FREEBSD_HASH
 # Clear out the current set of patches so we can download the new set.
