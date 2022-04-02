@@ -1,17 +1,18 @@
 # Created by: Florent Thoumie <flz@FreeBSD.org>
 
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	98.0.4758.102
+PORTVERSION=	99.0.4844.74
 PORTREVISION=	1
 # Set this to the latest commit whichever branch of FreeBSD's Chromium repository we are building.
 # Example: If building Chromium 98, use hash of latest commit in branch v98.
-FREEBSD_HASH=	0babada855b571cf2328b81b8f938909cb67d760
+FREEBSD_HASH=	9256690d07daaf336c0b15cdaa2343f2670e39e7
 
 CATEGORIES=	www
 
 #USE_GITHUB=	nodefault
 #GH_TUPLE=	Eloston:ungoogled-chromium:${PORTVERSION}-${PORTREVISION}:ungoogled \
 #		freebsd:chromium:${FREEBSD_HASH}:patches
+# TODO: Switch source for FreeBSD Chromium patches.
 MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:chromium \
 		https://codeload.github.com/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled \
 		https://codeload.github.com/freebsd/freebsd-ports/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
@@ -40,12 +41,10 @@ BUILD_DEPENDS=	bash:shells/bash \
 		flock:sysutils/flock \
 		node:www/node \
 		xcb-proto>0:x11/xcb-proto \
-		${LOCALBASE}/bin/ar:devel/binutils \
 		${LOCALBASE}/include/linux/videodev2.h:multimedia/v4l_compat \
 		${LOCALBASE}/share/usbids/usb.ids:misc/usbids \
 		${PYTHON_PKGNAMEPREFIX}html5lib>0:www/py-html5lib@${PY_FLAVOR} \
 		${LOCALBASE}/include/va/va.h:multimedia/libva \
-		${LOCALBASE}/bin/python2.7:lang/python27 \
 		${LOCALBASE}/libdata/pkgconfig/dri.pc:graphics/mesa-dri \
 		patch>0:devel/patch
 
@@ -83,12 +82,11 @@ LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
 RUN_DEPENDS=	xdg-open:devel/xdg-utils \
 		noto-basic>0:x11-fonts/noto-basic
 
-USES=		bison compiler:c++17-lang cpe desktop-file-utils dos2unix gl gnome jpeg localbase:ldflags  \
+USES=		bison compiler:c++17-lang cpe desktop-file-utils gl gnome jpeg localbase:ldflags  \
 		ninja perl5 pkgconfig python:3.6-3.9,build shebangfix tar:xz xorg
 
 CPE_VENDOR=	google
 CPE_PRODUCT=	chrome
-DOS2UNIX_FILES=	third_party/vulkan_memory_allocator/include/vk_mem_alloc.h
 USE_GL=		gbm gl
 USE_GNOME=	atk dconf gdkpixbuf2 glib20 gtk30 libxml2 libxslt
 USE_LDCONFIG=	${DATADIR}
@@ -100,7 +98,8 @@ SHEBANG_FILES=	chrome/tools/build/linux/chrome-wrapper buildtools/linux64/clang-
 MAKE_ARGS=	-C out/${BUILDTYPE}
 ALL_TARGET=	chrome
 
-BINARY_ALIAS=	python=${LOCALBASE}/bin/python2.7 \
+BINARY_ALIAS=	ar=/usr/bin/llvm-ar \
+		nm=/usr/bin/llvm-nm \
 		python3=${PYTHON_CMD}
 
 # TODO bz@ : install libwidevinecdm.so (see third_party/widevine/cdm/BUILD.gn)
@@ -112,7 +111,7 @@ BINARY_ALIAS=	python=${LOCALBASE}/bin/python2.7 \
 GN_ARGS+=	enable_wmax_tokens=false \
 		fatal_linker_warnings=false \
 		is_clang=true \
-		optimize_webui=false \
+		optimize_webui=true \
 		toolkit_views=true \
 		use_allocator="none" \
 		use_allocator_shim=false \
@@ -212,7 +211,7 @@ SNDIO_VARS_OFF=		GN_ARGS+=use_sndio=false
 
 .include "Makefile.tests"
 TEST_DISTFILES=		chromium-${DISTVERSION}-testdata${EXTRACT_SUFX} \
-			test_fonts-85${EXTRACT_SUFX}:fonts
+			test_fonts-cd96fc55dc243f6c6f4cb63ad117cad6cd48dceb.tar.gz:fonts
 TEST_ALL_TARGET=	${TEST_TARGETS}
 
 .include <bsd.port.options.mk>
