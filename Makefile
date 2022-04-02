@@ -5,7 +5,7 @@ PORTVERSION=	99.0.4844.74
 PORTREVISION=	1
 # Set this to the latest commit whichever branch of FreeBSD's Chromium repository we are building.
 # Example: If building Chromium 98, use hash of latest commit in branch v98.
-FREEBSD_HASH=	9256690d07daaf336c0b15cdaa2343f2670e39e7
+FREEBSD_HASH=	064dbd0f3082fd1da6e11ba7386f3a9182543341
 
 CATEGORIES=	www
 
@@ -22,7 +22,7 @@ DISTFILES=	chromium-${PORTVERSION}${EXTRACT_SUFX}:chromium \
 		ungoogled-chromium-${PORTVERSION}-${PORTREVISION}.tar.gz:ungoogled \
 		freebsd-patches-${PORTVERSION}.tar.gz:freebsd
 NO_CHECKSUM=yes
-PATCHDIR=	${WRKDIR}/chromium-${FREEBSD_HASH}/www/chromium/files
+PATCHDIR=	${WRKDIR}/freebsd-ports-${FREEBSD_HASH}/www/chromium/files
 WRKSRC=		${WRKDIR}/chromium-${PORTVERSION}
 
 # TODO: Change this.
