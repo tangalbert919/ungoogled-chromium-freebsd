@@ -1,11 +1,11 @@
 # Created by: Florent Thoumie <flz@FreeBSD.org>
+# Modified by: Albert Tang <tangalbert919@yahoo.com>
 
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	99.0.4844.74
-PORTREVISION=	1
-# Set this to the latest commit whichever branch of FreeBSD's Chromium repository we are building.
-# Example: If building Chromium 98, use hash of latest commit in branch v98.
-FREEBSD_HASH=	064dbd0f3082fd1da6e11ba7386f3a9182543341
+PORTVERSION=	100.0.4896.60
+UG_REVISION=	1
+# Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
+FREEBSD_HASH=	8fc70d7e9054bbf25a8ec037bb54cbec42adc026
 
 CATEGORIES=	www
 
@@ -14,12 +14,12 @@ CATEGORIES=	www
 #		freebsd:chromium:${FREEBSD_HASH}:patches
 # TODO: Switch source for FreeBSD Chromium patches.
 MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:chromium \
-		https://codeload.github.com/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${PORTREVISION}?dummy=/:ungoogled \
+		https://codeload.github.com/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${UG_REVISION}?dummy=/:ungoogled \
 		https://codeload.github.com/freebsd/freebsd-ports/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
 		LOCAL/rene/chromium/:fonts
 #DISTFILES=	${DISTNAME}${EXTRACT_SUFX}
 DISTFILES=	chromium-${PORTVERSION}${EXTRACT_SUFX}:chromium \
-		ungoogled-chromium-${PORTVERSION}-${PORTREVISION}.tar.gz:ungoogled \
+		ungoogled-chromium-${PORTVERSION}-${UG_REVISION}.tar.gz:ungoogled \
 		freebsd-patches-${PORTVERSION}.tar.gz:freebsd
 NO_CHECKSUM=yes
 PATCHDIR=	${WRKDIR}/freebsd-ports-${FREEBSD_HASH}/www/chromium/files
@@ -98,9 +98,7 @@ SHEBANG_FILES=	chrome/tools/build/linux/chrome-wrapper buildtools/linux64/clang-
 MAKE_ARGS=	-C out/${BUILDTYPE}
 ALL_TARGET=	chrome
 
-BINARY_ALIAS=	ar=/usr/bin/llvm-ar \
-		nm=/usr/bin/llvm-nm \
-		python3=${PYTHON_CMD}
+BINARY_ALIAS=	python3=${PYTHON_CMD}
 
 # TODO bz@ : install libwidevinecdm.so (see third_party/widevine/cdm/BUILD.gn)
 #
@@ -123,6 +121,7 @@ GN_ARGS+=	enable_wmax_tokens=false \
 		use_system_freetype=false \
 		use_system_harfbuzz=true \
 		use_system_libjpeg=true \
+		use_system_wayland_scanner=true
 		use_udev=false \
 		extra_cxxflags="${CXXFLAGS}" \
 		extra_ldflags="${LDFLAGS}"
@@ -138,7 +137,7 @@ GN_BOOTSTRAP_FLAGS=	--no-clean --no-rebuild --skip-generate-buildfiles
 GN_ARGS+=	google_api_key="AIzaSyBsp9n41JLW8jCokwn7vhoaMejDFRd1mp8"
 
 # Ungoogled-chromium GN file
-GN_FILE=	${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/flags.gn
+GN_FILE=	${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/flags.gn
 
 SUB_FILES=	chromium-browser.desktop chrome
 SUB_LIST+=	COMMENT="${COMMENT}"
@@ -177,13 +176,13 @@ DEBUG_VARS=		BUILDTYPE=Debug \
 			GN_ARGS+=is_component_build=false \
 			GN_ARGS+=symbol_level=1 \
 			GN_BOOTSTRAP_FLAGS+=--debug \
-			WANTSPACE="lots of free disk space (~ 13GB)"
+			WANTSPACE="21 GB"
 DEBUG_VARS_OFF=		BUILDTYPE=Release \
 			GN_ARGS+=blink_symbol_level=0 \
 			GN_ARGS+=is_debug=false \
 			GN_ARGS+=is_official_build=true \
 			GN_ARGS+=symbol_level=0 \
-			WANTSPACE="a fair amount of free disk space (~ 6.5GB)"
+			WANTSPACE="14 GB"
 
 DRIVER_MAKE_ARGS=	chromedriver
 
@@ -193,7 +192,7 @@ KERBEROS_VARS_OFF=	GN_ARGS+=use_kerberos=false
 
 LTO_VARS=		GN_ARGS+=use_thin_lto=true \
 			GN_ARGS+=thin_lto_enable_optimizations=true \
-			WANTSPACE="lots of free disk space (~ 14 GB)"
+			WANTSPACE="14 GB"
 LTO_VARS_OFF=		GN_ARGS+=use_thin_lto=false
 
 MIT_LIB_DEPENDS=	libkrb.so.3:security/krb5
@@ -221,11 +220,18 @@ TEST_ALL_TARGET=	${TEST_TARGETS}
 IGNORE=		you have selected HEIMDAL_BASE but do not have Heimdal installed in base
 .endif
 
-.if ${COMPILER_VERSION} < 120
-
-.if ${PORT_OPTIONS:MLTO}
-BROKEN+=	does not build with LTO needs LLVM 12+
-.endif
+.if ${COMPILER_VERSION} < 130
+LLVM_DEFAULT=		13
+BUILD_DEPENDS+=		clang${LLVM_DEFAULT}:devel/llvm${LLVM_DEFAULT}
+BINARY_ALIAS+=		cpp=${LOCALBASE}/bin/clang-cpp${LLVM_DEFAULT} \
+			cc=${LOCALBASE}/bin/clang${LLVM_DEFAULT} \
+			c++=${LOCALBASE}/bin/clang++${LLVM_DEFAULT} \
+			ar=${LOCALBASE}/bin/llvm-ar${LLVM_DEFAULT} \
+			nm=${LOCALBASE}/bin/llvm-nm${LLVM_DEFAULT} \
+			ld=${LOCALBASE}/bin/ld.lld${LLVM_DEFAULT}
+.else
+BINARY_ALIAS+=		ar=/usr/bin/llvm-ar \
+			nm=/usr/bin/llvm-nm
 .endif
 
 # swiftshader/lib/{libEGL.so,libGLESv2.so} is x86 only
@@ -246,12 +252,12 @@ MAKE_ENV+=	C_INCLUDE_PATH=${LOCALBASE}/include \
 pre-everything::
 	@${ECHO_MSG}
 	@${ECHO_MSG} "To build Chromium, you should have around 2GB of memory"
-	@${ECHO_MSG} "and ${WANTSPACE}."
+	@${ECHO_MSG} "and ${WANTSPACE} of free disk space."
 	@${ECHO_MSG}
 
 #do-extract:
 #	tar -xf ${DISTDIR}/chromium-${PORTVERSION}.tar.xz -C ${WRKDIR}
-#	tar -xf ${DISTDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}.tar.gz -C ${WRKDIR}
+#	tar -xf ${DISTDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}.tar.gz -C ${WRKDIR}
 #	tar -xf ${DISTDIR}/freebsd-patches-${PORTVERSION}.tar.gz freebsd-ports-${FREEBSD_HASH}/www/chromium --strip-components=1 -C ${WRKDIR}
 
 post-extract-TEST-on:
@@ -277,17 +283,17 @@ pre-configure:
 	# Apply ungoogled-chromium changes here.
 	@${ECHO_MSG} "Pruning binaries"
 	@${PYTHON_CMD} \
-		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/prune_binaries.py ${WRKSRC} \
-		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/pruning.list
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/prune_binaries.py ${WRKSRC} \
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/pruning.list
 	@${ECHO_MSG} "Applying patches"
 	@${PYTHON_CMD} \
-		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/patches.py apply ${WRKSRC} \
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/patches.py apply ${WRKSRC} \
 		./patches --patch-bin /usr/local/bin/gpatch
 	@${ECHO_MSG} "Applying domain substitution"
 	@${PYTHON_CMD} \
-		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/utils/domain_substitution.py apply \
-		-r ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/domain_regex.list \
-		-f ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${PORTREVISION}/domain_substitution.list \
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/domain_substitution.py apply \
+		-r ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/domain_regex.list \
+		-f ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/domain_substitution.list \
 		-c ${WRKDIR}/domainsubcache.tar.gz ${WRKSRC}
 
 do-configure:
@@ -311,6 +317,8 @@ do-configure:
 do-install:
 	@${MKDIR} ${STAGEDIR}${DATADIR}
 	${INSTALL_MAN} ${WRKSRC}/chrome/app/resources/manpage.1.in \
+		${STAGEDIR}${MANPREFIX}/man/man1/chrome.1
+	@${SED} -i "" -e 's,\@\@PACKAGE\@\@,chromium,g;s,\@\@MENUNAME\@\@,Chromium Web Browser,g' \
 		${STAGEDIR}${MANPREFIX}/man/man1/chrome.1
 	${CP} ${WRKSRC}/chrome/app/theme/chromium/product_logo_22_mono.png ${WRKSRC}/chrome/app/theme/chromium/product_logo_22.png
 .for s in 22 24 48 64 128 256
@@ -341,6 +349,8 @@ do-install:
 .for f in libEGL.so libGLESv2.so libVkICD_mock_icd.so
 	${INSTALL_LIB} ${WRKSRC}/out/${BUILDTYPE}/${f} ${STAGEDIR}${DATADIR}
 .endfor
+	${INSTALL_LIB} ${WRKSRC}/out/${BUILDTYPE}/libvulkan.so.1 \
+		${STAGEDIR}${DATADIR}/libvulkan.so
 .if ${BUILDTYPE} == Debug
 	${INSTALL_LIB} ${WRKSRC}/out/${BUILDTYPE}/libVkLayer_khronos_validation.so ${STAGEDIR}${DATADIR}
 .endif
@@ -357,8 +367,6 @@ do-install:
 
 post-install-DEBUG-on:
 	${INSTALL_LIB} ${WRKSRC}/out/${BUILDTYPE}/*.so \
-		${STAGEDIR}${DATADIR}
-	${INSTALL_LIB} ${WRKSRC}/out/${BUILDTYPE}/libvulkan.so.1 \
 		${STAGEDIR}${DATADIR}
 	${INSTALL_PROGRAM} ${WRKSRC}/out/${BUILDTYPE}/character_data_generator \
 		${STAGEDIR}${DATADIR}
