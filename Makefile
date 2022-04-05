@@ -12,7 +12,6 @@ CATEGORIES=	www
 #USE_GITHUB=	nodefault
 #GH_TUPLE=	Eloston:ungoogled-chromium:${PORTVERSION}-${PORTREVISION}:ungoogled \
 #		freebsd:chromium:${FREEBSD_HASH}:patches
-# TODO: Switch source for FreeBSD Chromium patches.
 MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:chromium \
 		https://codeload.github.com/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${UG_REVISION}?dummy=/:ungoogled \
 		https://codeload.github.com/freebsd/freebsd-ports/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
@@ -121,7 +120,7 @@ GN_ARGS+=	enable_wmax_tokens=false \
 		use_system_freetype=false \
 		use_system_harfbuzz=true \
 		use_system_libjpeg=true \
-		use_system_wayland_scanner=true
+		use_system_wayland_scanner=true \
 		use_udev=false \
 		extra_cxxflags="${CXXFLAGS}" \
 		extra_ldflags="${LDFLAGS}"
