@@ -2,10 +2,10 @@
 # Modified by: Albert Tang <tangalbert919@yahoo.com>
 
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	100.0.4896.60
+PORTVERSION=	100.0.4896.75
 UG_REVISION=	1
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	8fc70d7e9054bbf25a8ec037bb54cbec42adc026
+FREEBSD_HASH=	b1a4e7e1d7cea4c77710a12c3b3e94433d6176ce
 
 CATEGORIES=	www
 
@@ -15,7 +15,7 @@ CATEGORIES=	www
 MASTER_SITES=	https://commondatastorage.googleapis.com/chromium-browser-official/:chromium \
 		https://codeload.github.com/Eloston/ungoogled-chromium/tar.gz/${PORTVERSION}-${UG_REVISION}?dummy=/:ungoogled \
 		https://codeload.github.com/freebsd/freebsd-ports/tar.gz/${FREEBSD_HASH}?dummy=/:freebsd \
-		LOCAL/rene/chromium/:fonts
+		https://nerd.hu/distfiles/:fonts
 #DISTFILES=	${DISTNAME}${EXTRACT_SUFX}
 DISTFILES=	chromium-${PORTVERSION}${EXTRACT_SUFX}:chromium \
 		ungoogled-chromium-${PORTVERSION}-${UG_REVISION}.tar.gz:ungoogled \
@@ -75,6 +75,7 @@ LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
 		libnss3.so:security/nss \
 		libexpat.so:textproc/expat2 \
 		libfontconfig.so:x11-fonts/fontconfig \
+		libwayland-client.so:graphics/wayland \
 		libxkbcommon.so:x11/libxkbcommon \
 		libxshmfence.so:x11/libxshmfence
 
@@ -82,7 +83,7 @@ RUN_DEPENDS=	xdg-open:devel/xdg-utils \
 		noto-basic>0:x11-fonts/noto-basic
 
 USES=		bison compiler:c++17-lang cpe desktop-file-utils gl gnome jpeg localbase:ldflags  \
-		ninja perl5 pkgconfig python:3.6-3.9,build shebangfix tar:xz xorg
+		ninja perl5 pkgconfig python:3.7+,build shebangfix tar:xz xorg
 
 CPE_VENDOR=	google
 CPE_PRODUCT=	chrome
