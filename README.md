@@ -33,11 +33,9 @@ git checkout <latest tag from ungoogled-chromium>
 cd ..
 ```
 
-Now fetch and extract the Chromium source:
+Now setup the Chromium source:
 ```
-mkdir -p build/{download_cache,src}
-python ungoogled-chromium/utils/download.py retrieve -i ungoogled-chromium/downloads.ini -c build/download_cache
-python ungoogled-chromium/utils/download.py unpack -i ungoogled-chromium/downloads.ini -c build/download_cache build/src
+./devutils/setup-chromium-source.sh
 ```
 
 Edit the `FREEBSD_HASH` variable in the Makefile with the latest commit hash from [this website](https://github.com/freebsd/freebsd-ports/commits/main/www/chromium). You must get the FULL hash, not the shortened one with only seven characters. Edit the `PORTVERSION` variable in the same file with the version of Chromium corresponding to that commit hash.
@@ -46,7 +44,7 @@ Once you have edited both, pull the FreeBSD patches with `devutils/pull-freebsd-
 
 Setup and apply the Ungoogled-chromium patches:
 ```
-cp ungoogled-chromium/patches .
+cp -r ungoogled-chromium/patches .
 source devutils/set_quilt_vars.sh
 cd build/src
 while quilt push; do quilt refresh; done

@@ -27,18 +27,18 @@
  #include "base/compiler_specific.h"
  #include "base/containers/adapters.h"
  #include "base/containers/contains.h"
-@@ -1904,6 +1905,8 @@ void TabStrip::OnMouseEventInTab(views::
+@@ -1519,6 +1520,8 @@ void TabStrip::OnMouseEventInTab(views::
  }
  
  void TabStrip::UpdateHoverCard(Tab* tab, HoverCardUpdateType update_type) {
 +  if (base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII("tab-hover-cards") == "tooltip" ||
 +      base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII("tab-hover-cards") == "none") return;
-   // Some operations (including e.g. starting a drag) can cause the tab focus
-   // to change at the same time as the tabstrip is starting to animate; the
-   // hover card should not be visible at this time.
+   tab_container_->UpdateHoverCard(tab, update_type);
+ }
+ 
 --- a/chrome/browser/ungoogled_flag_choices.h
 +++ b/chrome/browser/ungoogled_flag_choices.h
-@@ -75,4 +75,13 @@ const FeatureEntry::Choice kCloseConfirm
+@@ -70,4 +70,13 @@ const FeatureEntry::Choice kCloseConfirm
       "close-confirmation",
       "multiple"},
  };
@@ -54,7 +54,7 @@
  #endif  // CHROME_BROWSER_UNGOOGLED_FLAG_CHOICES_H_
 --- a/chrome/browser/ungoogled_flag_entries.h
 +++ b/chrome/browser/ungoogled_flag_entries.h
-@@ -84,4 +84,8 @@
+@@ -80,4 +80,8 @@
       "Custom New Tab Page",
       "Allows setting a custom URL for the new tab page.  Value can be internal (e.g. `about:blank`), external (e.g. `example.com`), or local (e.g. `file:///tmp/startpage.html`).  This applies for incognito windows as well when not set to a `chrome://` internal page.  ungoogled-chromium flag",
       kOsDesktop, ORIGIN_LIST_VALUE_TYPE("custom-ntp", "")},
