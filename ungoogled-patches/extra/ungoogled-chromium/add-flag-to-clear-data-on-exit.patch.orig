@@ -1,0 +1,97 @@
+--- a/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.cc
++++ b/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.cc
+@@ -25,6 +25,7 @@
+ #include "chrome/browser/profiles/profile.h"
+ #include "chrome/browser/profiles/profile_manager.h"
+ #include "chrome/browser/sync/sync_service_factory.h"
++#include "components/browsing_data/core/features.h"
+ #include "components/browsing_data/core/pref_names.h"
+ #include "components/keep_alive_registry/keep_alive_types.h"
+ #include "components/keep_alive_registry/scoped_keep_alive.h"
+@@ -157,6 +158,21 @@ class BrowsingDataRemoverObserver
+ #endif
+ };
+ 
++uint64_t AllOriginTypeMask() {
++  return content::BrowsingDataRemover::ORIGIN_TYPE_PROTECTED_WEB |
++         content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB;
++}
++
++uint64_t AllRemoveMask() {
++  return content::BrowsingDataRemover::DATA_TYPE_CACHE |
++         content::BrowsingDataRemover::DATA_TYPE_DOWNLOADS |
++         chrome_browsing_data_remover::DATA_TYPE_CONTENT_SETTINGS |
++         chrome_browsing_data_remover::DATA_TYPE_FORM_DATA |
++         chrome_browsing_data_remover::DATA_TYPE_HISTORY |
++         chrome_browsing_data_remover::DATA_TYPE_PASSWORDS |
++         chrome_browsing_data_remover::DATA_TYPE_SITE_DATA;
++}
++
+ uint64_t GetOriginTypeMask(const base::Value& data_types) {
+   uint64_t result = 0;
+   for (const auto& data_type : data_types.GetListDeprecated()) {
+@@ -307,8 +323,9 @@ void ChromeBrowsingDataLifetimeManager::
+     bool keep_browser_alive) {
+   auto* data_types = profile_->GetPrefs()->GetList(
+       browsing_data::prefs::kClearBrowsingDataOnExitList);
+-  if (data_types && !data_types->GetListDeprecated().empty() &&
+-      !SyncServiceFactory::IsSyncAllowed(profile_)) {
++  bool cdoe = base::FeatureList::IsEnabled(browsing_data::features::kClearDataOnExit);
++  if (cdoe || (data_types && !data_types->GetListDeprecated().empty() &&
++      !SyncServiceFactory::IsSyncAllowed(profile_))) {
+     profile_->GetPrefs()->SetBoolean(
+         browsing_data::prefs::kClearBrowsingDataOnExitDeletionPending, true);
+     auto* remover = profile_->GetBrowsingDataRemover();
+@@ -319,8 +336,8 @@ void ChromeBrowsingDataLifetimeManager::
+       DCHECK(keep_browser_alive);
+ #endif
+     remover->RemoveAndReply(base::Time(), base::Time::Max(),
+-                            GetRemoveMask(*data_types),
+-                            GetOriginTypeMask(*data_types),
++                            cdoe ? AllRemoveMask() : GetRemoveMask(*data_types),
++                            cdoe ? AllOriginTypeMask() : GetOriginTypeMask(*data_types),
+                             BrowsingDataRemoverObserver::Create(
+                                 remover, /*filterable_deletion=*/true, profile_,
+                                 keep_browser_alive));
+--- a/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager_factory.cc
++++ b/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager_factory.cc
+@@ -48,6 +48,8 @@ ChromeBrowsingDataLifetimeManagerFactory
+ KeyedService* ChromeBrowsingDataLifetimeManagerFactory::BuildServiceInstanceFor(
+     content::BrowserContext* context) const {
+   if (!base::FeatureList::IsEnabled(
++          browsing_data::features::kClearDataOnExit) &&
++      !base::FeatureList::IsEnabled(
+           browsing_data::features::kEnableBrowsingDataLifetimeManager))
+     return nullptr;
+   Profile* profile = Profile::FromBrowserContext(context);
+--- a/chrome/browser/ungoogled_flag_entries.h
++++ b/chrome/browser/ungoogled_flag_entries.h
+@@ -56,4 +56,8 @@
+      "Keep old history",
+      "Keep history older than 3 months.  ungoogled-chromium flag",
+      kOsAll, SINGLE_VALUE_TYPE("keep-old-history")},
++    {"clear-data-on-exit",
++     "Clear data on exit",
++     "Clears all browsing data on exit.  ungoogled-chromium flag",
++     kOsDesktop, FEATURE_VALUE_TYPE(browsing_data::features::kClearDataOnExit)},
+ #endif  // CHROME_BROWSER_UNGOOGLED_FLAG_ENTRIES_H_
+--- a/components/browsing_data/core/features.cc
++++ b/components/browsing_data/core/features.cc
+@@ -19,5 +19,7 @@ const base::Feature kEnableBrowsingDataL
+ const base::Feature kEnableBrowsingDataLifetimeManager{
+     "BrowsingDataLifetimeManager", base::FEATURE_ENABLED_BY_DEFAULT};
+ #endif
++
++const base::Feature kClearDataOnExit{"ClearDataOnExit", base::FEATURE_DISABLED_BY_DEFAULT};
+ }  // namespace features
+ }  // namespace browsing_data
+--- a/components/browsing_data/core/features.h
++++ b/components/browsing_data/core/features.h
+@@ -17,6 +17,7 @@ extern const base::Feature kEnableRemovi
+ // defined by the BrowsingDataLifetime policy.
+ extern const base::Feature kEnableBrowsingDataLifetimeManager;
+ 
++extern const base::Feature kClearDataOnExit;
+ }  // namespace features
+ }  // namespace browsing_data
+ 

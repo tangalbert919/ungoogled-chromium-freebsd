@@ -1,0 +1,121 @@
+# Disables references to fonts.googleapis.com
+
+--- a/chrome/browser/ash/child_accounts/time_limits/web_time_limit_error_page/resources/web_time_limit_error_page.html
++++ b/chrome/browser/ash/child_accounts/time_limits/web_time_limit_error_page/resources/web_time_limit_error_page.html
+@@ -5,7 +5,7 @@
+ <meta name="viewport"
+       content="initial-scale=1, minimum-scale=1,width=device-width">
+ <title>$i18n{blockPageTitle}</title>
+-<link href="https://fonts.googleapis.com/css?family=Google+Sans" rel="stylesheet">
++<link href="chrome://resources/css/roboto.css" rel="stylesheet">
+ <link rel="stylesheet" href="../../../../../../../components/security_interstitials/core/common/resources/interstitial_core.css">
+ <link rel="stylesheet" href="../../../../../supervised_user/supervised_user_error_page/resources/supervised_user_block_interstitial.css">
+ </head>
+--- a/chrome/browser/resources/chromeos/accessibility/chromevox/options/options.css
++++ b/chrome/browser/resources/chromeos/accessibility/chromevox/options/options.css
+@@ -2,7 +2,7 @@
+  * Use of this source code is governed by a BSD-style license that can be
+  * found in the LICENSE file. */
+ 
+-@import url(https://fonts.googleapis.com/css?family=Roboto);
++@import url(chrome://resources/css/roboto.css);
+ 
+ body {
+     margin: 0 0 20px 0;
+--- a/chrome/browser/resources/chromeos/accessibility/select_to_speak/options.css
++++ b/chrome/browser/resources/chromeos/accessibility/select_to_speak/options.css
+@@ -2,7 +2,7 @@
+  * Use of this source code is governed by a BSD-style license that can be
+  * found in the LICENSE file. */
+ 
+-@import url(https://fonts.googleapis.com/css?family=Roboto);
++@import url(chrome://resources/css/roboto.css);
+ 
+ body {
+   margin: 0 0 20px 0;
+--- a/chrome/browser/supervised_user/supervised_user_error_page/resources/supervised_user_block_interstitial.html
++++ b/chrome/browser/supervised_user/supervised_user_error_page/resources/supervised_user_block_interstitial.html
+@@ -5,7 +5,7 @@
+ <meta name="viewport"
+     content="initial-scale=1, minimum-scale=1, width=device-width">
+ <title>$i18n{blockPageTitle}</title>
+-<link href="https://fonts.googleapis.com/css?family=Google+Sans" rel="stylesheet">
++<link href="chrome://resources/css/roboto.css" rel="stylesheet">
+ <link rel="stylesheet" href="../../../../../components/security_interstitials/core/common/resources/interstitial_core.css">
+ <link rel="stylesheet" href="supervised_user_block_interstitial.css">
+ <script src="../../../../../ui/webui/resources/js/cr.js"></script>
+--- a/components/dom_distiller/content/browser/dom_distiller_viewer_source.cc
++++ b/components/dom_distiller/content/browser/dom_distiller_viewer_source.cc
+@@ -298,7 +298,7 @@ bool DomDistillerViewerSource::ShouldSer
+ std::string DomDistillerViewerSource::GetContentSecurityPolicy(
+     network::mojom::CSPDirectiveName directive) {
+   if (directive == network::mojom::CSPDirectiveName::StyleSrc) {
+-    return "style-src 'self' https://fonts.googleapis.com;";
++    return "style-src 'self';";
+   } else if (directive == network::mojom::CSPDirectiveName::ChildSrc) {
+     return "child-src *;";
+   } else if (directive ==
+--- a/components/dom_distiller/core/html/preview.html
++++ b/components/dom_distiller/core/html/preview.html
+@@ -11,7 +11,7 @@ found in the LICENSE file.
+   <meta name="theme-color" id="theme-color">
+   <title>Title goes here and it could be kind of lengthy - Publisher name</title>
+   <link href="../css/distilledpage.css" rel="stylesheet" type="text/css">
+-  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
++  <link href='chrome://resources/css/roboto.css' rel='stylesheet' type='text/css'>
+   <style>
+     .english :lang(th) {display: none}
+     .english :lang(zh) {display: none}
+--- a/components/dom_distiller/core/javascript/dom_distiller_viewer.js
++++ b/components/dom_distiller/core/javascript/dom_distiller_viewer.js
+@@ -109,7 +109,7 @@ function maybeSetWebFont() {
+   }
+ 
+   const e = document.createElement('link');
+-  e.href = 'https://fonts.googleapis.com/css?family=Roboto';
++  e.href = 'chrome://resources/css/roboto.css';
+   e.rel = 'stylesheet';
+   e.type = 'text/css';
+   document.head.appendChild(e);
+--- a/third_party/crashpad/crashpad/doc/support/crashpad_doxygen.css
++++ b/third_party/crashpad/crashpad/doc/support/crashpad_doxygen.css
+@@ -12,8 +12,7 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License. */
+ 
+-@import "https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&subset=latin,cyrillic-ext,greek-ext,cyrillic,greek,vietnamese,latin-ext";
+-@import "https://fonts.googleapis.com/css?family=Source+Code+Pro";
++@import "chrome://resources/css/roboto.css";
+ 
+ body,
+ table,
+--- a/tools/md_browser/base.css
++++ b/tools/md_browser/base.css
+@@ -16,8 +16,7 @@
+ 
+ /* Common styles and definitions. */
+ 
+-@import "//fonts.googleapis.com/css?family=Open+Sans:300,400,700&subset=latin,cyrillic-ext,greek-ext,cyrillic,greek,vietnamese,latin-ext";
+-@import "//fonts.googleapis.com/css?family=Source+Code+Pro";
++@import "chrome://resources/css/roboto.css";
+ *,
+ *::after,
+ *::before {
+@@ -72,7 +71,7 @@ ul, ol {
+   user-select: none;
+ }
+ .u-monospace {
+-  font-family: 'Source Code Pro', monospace;
++  font-family: monospace;
+ }
+ 
+ /* Common.soy */
+@@ -82,7 +81,7 @@ ul, ol {
+   color: #000;
+   display: -ms-flexbox;
+   display: flex;
+-  font: 14px/1.54 'Open Sans', sans-serif;
++  font: 14px/1.54 'Roboto', sans-serif;
+   min-height: 100vh;
+   -ms-flex-direction: column;
+   flex-direction: column;

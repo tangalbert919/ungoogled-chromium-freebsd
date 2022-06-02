@@ -2,10 +2,10 @@
 # Modified by: Albert Tang <tangalbert919@yahoo.com>
 
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	101.0.4951.67
-UG_REVISION=	1
+PORTVERSION=	102.0.5005.61
+UG_REVISION=	3
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	67af9b9188dd441ea57aa973f47d5394f2baf639
+FREEBSD_HASH=	f3f269d7d22396afde4d79d8315491dfb4501cb1
 
 CATEGORIES=	www
 
@@ -56,6 +56,7 @@ LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
 		libspeex.so:audio/speex \
 		libdbus-1.so:devel/dbus \
 		libdbus-glib-1.so:devel/dbus-glib \
+		libevent.so:devel/libevent \
 		libicuuc.so:devel/icu \
 		libjsoncpp.so:devel/jsoncpp \
 		libpci.so:devel/libpci \
@@ -271,7 +272,8 @@ pre-configure:
 	#./build/linux/unbundle/remove_bundled_libraries.py [list of preserved]
 	cd ${WRKSRC} && ${SETENV} ${CONFIGURE_ENV} ${PYTHON_CMD} \
 		./build/linux/unbundle/replace_gn_files.py --system-libraries \
-		flac fontconfig freetype harfbuzz-ng libusb libdrm libpng libwebp libxml libxslt openh264 opus snappy || ${FALSE}
+		flac fontconfig freetype harfbuzz-ng libdrm libpng \
+		libusb libwebp libxml libxslt openh264 opus snappy || ${FALSE}
 	# Chromium uses an unreleased version of FFmpeg, so configure it
 .for brand in Chrome Chromium
 	${CP} -R \
@@ -357,12 +359,7 @@ do-install:
 
 	# SwiftShader
 .if ${ARCH} != aarch64
-	@${MKDIR} ${STAGEDIR}${DATADIR}/swiftshader
 	${INSTALL_LIB} ${WRKSRC}/out/${BUILDTYPE}/libvk_swiftshader.so ${STAGEDIR}${DATADIR}
-.for g in libEGL.so libGLESv2.so
-	${INSTALL_LIB} ${WRKSRC}/out/${BUILDTYPE}/swiftshader/${g} \
-		${STAGEDIR}${DATADIR}/swiftshader
-.endfor
 .endif
 
 post-install-DEBUG-on:

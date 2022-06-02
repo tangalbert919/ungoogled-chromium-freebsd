@@ -1,0 +1,32 @@
+--- a/chrome/browser/ui/views/tabs/new_tab_button.cc
++++ b/chrome/browser/ui/views/tabs/new_tab_button.cc
+@@ -59,10 +59,8 @@ NewTabButton::NewTabButton(TabStrip* tab
+   SetAnimateOnStateChange(true);
+ // TODO(crbug.com/1052397): Revisit the macro expression once build flag switch
+ // of lacros-chrome is complete.
+-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS)
+   SetTriggerableEventFlags(GetTriggerableEventFlags() |
+                            ui::EF_MIDDLE_MOUSE_BUTTON);
+-#endif
+ 
+   ink_drop_container_ =
+       AddChildView(std::make_unique<views::InkDropContainerView>());
+--- a/chrome/browser/ui/views/tabs/tab_strip.cc
++++ b/chrome/browser/ui/views/tabs/tab_strip.cc
+@@ -1733,8 +1733,6 @@ void TabStrip::NewTabButtonPressed(const
+ 
+     const ui::MouseEvent& mouse = static_cast<const ui::MouseEvent&>(event);
+     if (mouse.IsOnlyMiddleMouseButton()) {
+-      if (ui::Clipboard::IsSupportedClipboardBuffer(
+-              ui::ClipboardBuffer::kSelection)) {
+         ui::Clipboard* clipboard = ui::Clipboard::GetForCurrentThread();
+         CHECK(clipboard);
+         std::u16string clipboard_text;
+@@ -1742,7 +1740,6 @@ void TabStrip::NewTabButtonPressed(const
+                             /* data_dst = */ nullptr, &clipboard_text);
+         if (!clipboard_text.empty())
+           controller_->CreateNewTabWithLocation(clipboard_text);
+-      }
+       return;
+     }
+   }

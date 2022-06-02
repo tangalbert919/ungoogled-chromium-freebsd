@@ -1,0 +1,14 @@
+# Disable some background communication with clients2.google.com
+
+--- a/components/crash/core/app/crashpad_linux.cc
++++ b/components/crash/core/app/crashpad_linux.cc
+@@ -60,8 +60,7 @@ void SetFirstChanceExceptionHandler(bool
+ }
+ 
+ bool IsCrashpadEnabled() {
+-  return base::CommandLine::ForCurrentProcess()->HasSwitch(
+-      ::switches::kEnableCrashpad);
++  return false;
+ }
+ 
+ bool GetHandlerSocket(int* fd, pid_t* pid) {
