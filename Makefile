@@ -272,7 +272,7 @@ pre-configure:
 	#./build/linux/unbundle/remove_bundled_libraries.py [list of preserved]
 	cd ${WRKSRC} && ${SETENV} ${CONFIGURE_ENV} ${PYTHON_CMD} \
 		./build/linux/unbundle/replace_gn_files.py --system-libraries \
-		flac fontconfig freetype harfbuzz-ng libdrm libpng \
+		flac fontconfig freetype harfbuzz-ng libdrm libevent libpng \
 		libusb libwebp libxml libxslt openh264 opus snappy || ${FALSE}
 	# Chromium uses an unreleased version of FFmpeg, so configure it
 .for brand in Chrome Chromium
@@ -290,7 +290,7 @@ pre-configure:
 	@${ECHO_MSG} "Applying patches"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/patches.py apply ${WRKSRC} \
-		./patches --patch-bin /usr/local/bin/gpatch
+		./ungoogled-patches --patch-bin /usr/local/bin/gpatch
 	@${ECHO_MSG} "Applying domain substitution"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/domain_substitution.py apply \
