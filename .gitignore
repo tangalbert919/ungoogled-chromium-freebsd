@@ -1,4 +1,4 @@
 build/
 work/
-freebsd-patches/
+fb-upstream-patches/
 *.tar.gz
