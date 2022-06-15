@@ -1,0 +1,11 @@
+--- extra/ungoogled-chromium/enable-paste-and-go-new-tab-button.patch.orig	2022-05-31 11:16:15.332141400 -0500
++++ extra/ungoogled-chromium/enable-paste-and-go-new-tab-button.patch	2022-06-01 23:07:46.465120100 -0500
+@@ -4,7 +4,7 @@
+    SetAnimateOnStateChange(true);
+  // TODO(crbug.com/1052397): Revisit the macro expression once build flag switch
+  // of lacros-chrome is complete.
+--#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS)
++-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS) || BUILDFLAG(IS_BSD)
+    SetTriggerableEventFlags(GetTriggerableEventFlags() |
+                             ui::EF_MIDDLE_MOUSE_BUTTON);
+ -#endif
