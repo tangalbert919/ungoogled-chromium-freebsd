@@ -287,10 +287,15 @@ pre-configure:
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/prune_binaries.py ${WRKSRC} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/pruning.list
+	@${ECHO_MSG} "Patching ungoogled-chromium patches"
+	@${CP} -r ./freebsd-patches ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches
+.for i in ${ls freebsd-patches/*}
+	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/$i
+.endfor
 	@${ECHO_MSG} "Applying patches"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/patches.py apply ${WRKSRC} \
-		./ungoogled-patches --patch-bin /usr/local/bin/gpatch
+		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches --patch-bin /usr/local/bin/gpatch
 	@${ECHO_MSG} "Applying domain substitution"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/domain_substitution.py apply \
