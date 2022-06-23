@@ -44,7 +44,8 @@ Once you have edited both, pull the FreeBSD patches with `devutils/pull-freebsd-
 
 Setup and apply the Ungoogled-chromium patches:
 ```
-cp -r ungoogled-chromium/patches .
+./devutils/setup-ungoogled-patches.sh
+./devutils/fix-ungoogled-patches.sh
 source devutils/set_quilt_vars.sh
 cd build/src
 while quilt push; do quilt refresh; done
