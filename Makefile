@@ -2,10 +2,10 @@
 # Modified by: Albert Tang <tangalbert919@yahoo.com>
 
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	102.0.5005.115
+PORTVERSION=	103.0.5060.53
 UG_REVISION=	1
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	6fbdece63f38a16066099bccf424732baee41477
+FREEBSD_HASH=	80ffbf089df7cc8d4b4879e23f6816fc7e338f7f
 
 CATEGORIES=	www
 

@@ -1,49 +1,6 @@
---- core/ungoogled-chromium/fix-building-without-safebrowsing.patch.orig	2022-05-31 11:16:15.279024600 -0500
-+++ core/ungoogled-chromium/fix-building-without-safebrowsing.patch	2022-06-06 18:13:12.504602800 -0500
-@@ -73,7 +73,7 @@
-    auto delegate = std::make_unique<AccuracyServiceDelegate>(profile);
- --- a/chrome/browser/chrome_content_browser_client.cc
- +++ b/chrome/browser/chrome_content_browser_client.cc
--@@ -4298,11 +4298,13 @@ ChromeContentBrowserClient::CreateThrott
-+@@ -4300,11 +4300,13 @@ ChromeContentBrowserClient::CreateThrott
-                     &throttles);
-  #endif
-  
-@@ -87,7 +87,7 @@
-  
-  // TODO(crbug.com/1052397): Revisit the macro expression once build flag switch
-  // of lacros-chrome is complete.
--@@ -5699,26 +5701,7 @@ ChromeContentBrowserClient::GetSafeBrows
-+@@ -5701,26 +5703,7 @@ ChromeContentBrowserClient::GetSafeBrows
-      const std::vector<std::string>& allowlist_domains) {
-    DCHECK_CURRENTLY_ON(BrowserThread::IO);
-  
-@@ -115,7 +115,7 @@
-  }
-  
-  safe_browsing::RealTimeUrlLookupServiceBase*
--@@ -5739,11 +5722,6 @@ ChromeContentBrowserClient::GetUrlLookup
-+@@ -5741,11 +5724,6 @@ ChromeContentBrowserClient::GetUrlLookup
-          GetForProfile(profile);
-    }
-  #endif
-@@ -242,12 +242,22 @@
-  }
-  
-  void ChromeDownloadManagerDelegate::CheckDownloadAllowed(
--@@ -1732,8 +1729,7 @@ void ChromeDownloadManagerDelegate::Chec
-+@@ -1716,8 +1713,7 @@ ChromeDownloadManagerDelegate::GetQuaran
-+ std::unique_ptr<download::DownloadItemRenameHandler>
-+ ChromeDownloadManagerDelegate::GetRenameHandlerForDownload(
-+     download::DownloadItem* download_item) {
-+-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-+-    BUILDFLAG(IS_MAC) || BUILDFLAG(IS_BSD)
-++#if 0
-+   return enterprise_connectors::FileSystemRenameHandler::CreateIfNeeded(
-+       download_item);
-+ #else
-+@@ -1732,8 +1728,7 @@ void ChromeDownloadManagerDelegate::Chec
-    DCHECK(download_item);
+--- core/ungoogled-chromium/fix-building-without-safebrowsing.patch.orig	2022-06-23 09:42:28.853734900 -0500
++++ core/ungoogled-chromium/fix-building-without-safebrowsing.patch	2022-06-23 17:27:30.930133000 -0500
+@@ -247,7 +247,7 @@
     DCHECK(download_item->IsSavePackageDownload());
   
  -#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
@@ -52,7 +9,7 @@
  +#if 0
     absl::optional<enterprise_connectors::AnalysisSettings> settings =
         safe_browsing::DeepScanningRequest::ShouldUploadBinary(download_item);
-@@ -1019,7 +1029,7 @@
+@@ -1034,7 +1034,7 @@
   #endif
   
  -#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
