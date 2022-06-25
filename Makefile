@@ -289,9 +289,14 @@ pre-configure:
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/pruning.list
 	@${ECHO_MSG} "Patching ungoogled-chromium patches"
 	@${CP} -r ./freebsd-patches ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches
-.for i in ${ls freebsd-patches/*}
-	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/$i
-.endfor
+#.for i in ${ls freebsd-patches/*}
+	#patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/$i
+	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-disable-download-quarantine.patch
+	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-doh-changes.patch
+	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-enable-paste-and-go-new-tab-button.patch
+	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-fix-building-without-safebrowsing.patch
+	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-remove-uneeded-ui.patch
+#.endfor
 	@${ECHO_MSG} "Applying patches"
 	@${PYTHON_CMD} \
 		${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/utils/patches.py apply ${WRKSRC} \
