@@ -2,10 +2,10 @@
 # Modified by: Albert Tang <tangalbert919@yahoo.com>
 
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	103.0.5060.53
+PORTVERSION=	103.0.5060.114
 UG_REVISION=	1
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	80ffbf089df7cc8d4b4879e23f6816fc7e338f7f
+FREEBSD_HASH=	54a5b487fb63b9fd0e34dcabe08deaca85264cf3
 
 CATEGORIES=	www
 
@@ -83,8 +83,9 @@ LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
 RUN_DEPENDS=	xdg-open:devel/xdg-utils \
 		noto-basic>0:x11-fonts/noto-basic
 
-USES=		bison compiler:c++17-lang cpe desktop-file-utils gl gnome jpeg localbase:ldflags  \
-		ninja perl5 pkgconfig python:3.7+,build shebangfix tar:xz xorg
+USES=		bison compiler:c++17-lang cpe desktop-file-utils gl gnome iconv jpeg \
+		localbase:ldflags ninja perl5 pkgconfig python:3.7+,build shebangfix \
+		tar:xz xorg
 
 CPE_VENDOR=	google
 CPE_PRODUCT=	chrome
