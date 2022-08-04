@@ -1,11 +1,11 @@
---- extra/ungoogled-chromium/remove-uneeded-ui.patch.orig	2022-05-31 11:16:15.337008400 -0500
-+++ extra/ungoogled-chromium/remove-uneeded-ui.patch	2022-06-01 23:09:46.516388900 -0500
-@@ -124,7 +124,7 @@
+--- extra/ungoogled-chromium/remove-uneeded-ui.patch.orig	2022-08-04 16:51:55.669173100 -0500
++++ extra/ungoogled-chromium/remove-uneeded-ui.patch	2022-08-04 16:57:02.538693500 -0500
+@@ -125,7 +125,7 @@
  +          <div class="flex cr-padded-text">
  +            <div>$i18n{themes}</div><div class="secondary">[[themeSublabel_]]</div>
  +          </div>
-- <if expr="not is_linux or chromeos_ash or chromeos_lacros">
-+ <if expr="not is_posix or chromeos_ash or chromeos_lacros">
+- <if expr="not is_linux">
++ <if expr="not is_posix">
             <template is="dom-if" if="[[prefs.extensions.theme.id.value]]">
               <div class="separator"></div>
  --- a/chrome/browser/resources/settings/autofill_page/passwords_section.html
