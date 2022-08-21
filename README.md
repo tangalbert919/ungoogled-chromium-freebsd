@@ -4,7 +4,7 @@ FreeBSD packaging for [ungoogled-chromium](//github.com/ungoogled-software/ungoo
 
 ## Downloads
 
-Downloads are currently not available.
+You can find new downloads on the [Releases page](//github.com/tangalbert919/ungoogled-chromium-freebsd/releases) for this repository, and on the [ungoogled-chromium website](https://ungoogled-software.github.io/ungoogled-chromium-binaries).
 
 ## Building
 
