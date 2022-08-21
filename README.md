@@ -1,6 +1,6 @@
 # ungoogled-chromium-freebsd
 
-FreeBSD packaging for [ungoogled-chromium](//github.com/Eloston/ungoogled-chromium).
+FreeBSD packaging for [ungoogled-chromium](//github.com/ungoogled-software/ungoogled-chromium).
 
 ## Downloads
 
@@ -20,17 +20,9 @@ Once the ports collection is setup, this package can be built using `make`.
 
 You must have Git, Quilt, and Python 3.6+ installed. These instructions work on both BSD and Linux distros.
 
-To begin updating patches, clone this repository and its submodules:
+To begin updating patches, clone this repository:
 ```
-git clone --recurse-submodules https://github.com/tangalbert919/ungoogled-chromium-freebsd
-```
-
-Enter the repository and update the ungoogled-chromium submodule:
-```
-cd ungoogled-chromium/
-git fetch
-git checkout <latest tag from ungoogled-chromium>
-cd ..
+git clone https://github.com/tangalbert919/ungoogled-chromium-freebsd
 ```
 
 Now setup the Chromium source:
@@ -38,7 +30,7 @@ Now setup the Chromium source:
 ./devutils/setup-chromium-source.sh
 ```
 
-Edit the `FREEBSD_HASH` variable in the Makefile with the latest commit hash from [this website](https://github.com/freebsd/freebsd-ports/commits/main/www/chromium). You must get the FULL hash, not the shortened one with only seven characters. Edit the `PORTVERSION` variable in the same file with the version of Chromium corresponding to that commit hash.
+Edit the `FREEBSD_HASH` variable in the Makefile with the latest commit hash from [this website](https://github.com/freebsd/freebsd-ports/commits/main/www/chromium). You must get the **FULL** hash, not the shortened one with only seven characters. Edit the `PORTVERSION` variable in the same file with the version of Chromium corresponding to that commit hash.
 
 Once you have edited both, pull the FreeBSD patches with `devutils/pull-freebsd-patches.sh`, and then apply them with `devutils/apply-freebsd-patches.sh`.
 
