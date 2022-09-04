@@ -1,8 +1,8 @@
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	104.0.5112.102
+PORTVERSION=	105.0.5195.102
 UG_REVISION=	1
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	d442126e247f09a2d60f2aa0ad2a7a3ed8f452df
+FREEBSD_HASH=	88b6e6aa0e0b975f15090950736b9a6a9cb5e58d
 
 CATEGORIES=	www
 
@@ -121,6 +121,7 @@ GN_ARGS+=	enable_wmax_tokens=false \
 		use_system_freetype=false \
 		use_system_harfbuzz=true \
 		use_system_libjpeg=true \
+		use_system_libwayland=true \
 		use_system_wayland_scanner=true \
 		use_udev=false \
 		extra_cxxflags="${CXXFLAGS}" \
@@ -295,6 +296,7 @@ pre-configure:
 	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-enable-paste-and-go-new-tab-button.patch
 	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-fix-building-without-safebrowsing.patch
 	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-remove-uneeded-ui.patch
+	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-remove-unused-preferences-fields.patch
 #.endfor
 	@${ECHO_MSG} "Applying patches"
 	@${PYTHON_CMD} \

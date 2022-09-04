@@ -1,0 +1,11 @@
+--- core/ungoogled-chromium/remove-unused-preferences-fields.patch.orig	2022-09-04 10:57:23.308804000 -0500
++++ core/ungoogled-chromium/remove-unused-preferences-fields.patch	2022-09-04 11:04:38.079244800 -0500
+@@ -996,7 +996,7 @@
+    std::vector<std::unique_ptr<ConfigurationPolicyHandler>>
+        signin_legacy_policies;
+ -#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
+--    BUILDFLAG(IS_LINUX)
++-    BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
+ -  signin_legacy_policies.push_back(std::make_unique<SimplePolicyHandler>(
+ -      key::kForceBrowserSignin, prefs::kForceBrowserSignin,
+ -      base::Value::Type::BOOLEAN));
