@@ -1,8 +1,8 @@
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	105.0.5195.127
+PORTVERSION=	106.0.5249.61
 UG_REVISION=	1
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	8b165c2273443c51b20b74672722555a668616dd
+FREEBSD_HASH=	c080558054e014c94435ab11f399e518324abe31
 
 CATEGORIES=	www
 
@@ -105,8 +105,7 @@ BINARY_ALIAS=	python3=${PYTHON_CMD}
 # Some parts don't have use_system_* flag, and can be turned on/off by using
 # replace_gn_files.py script, some parts just turned on/off for target host
 # OS "target_os == is_bsd", like libusb, libpci.
-GN_ARGS+=	enable_wmax_tokens=false \
-		fatal_linker_warnings=false \
+GN_ARGS+=	fatal_linker_warnings=false \
 		icu_use_data_file=false \
 		is_clang=true \
 		optimize_webui=true \
@@ -221,7 +220,7 @@ TEST_ALL_TARGET=	${TEST_TARGETS}
 IGNORE=		you have selected HEIMDAL_BASE but do not have Heimdal installed in base
 .endif
 
-.if ${COMPILER_VERSION} < 130
+.if ${COMPILER_VERSION} != 130
 LLVM_DEFAULT=		13
 BUILD_DEPENDS+=		clang${LLVM_DEFAULT}:devel/llvm${LLVM_DEFAULT}
 BINARY_ALIAS+=		cpp=${LOCALBASE}/bin/clang-cpp${LLVM_DEFAULT} \
