@@ -94,7 +94,7 @@ USE_LDCONFIG=	${DATADIR}
 USE_PERL5=	build
 USE_XORG=	x11 xcb xcomposite xcursor xext xdamage xfixes xi \
 		xorgproto xrandr xrender xscrnsaver xtst
-USE_QT=		buildtools:build
+USE_QT5=	buildtools:build
 SHEBANG_FILES=	chrome/tools/build/linux/chrome-wrapper buildtools/linux64/clang-format
 
 MAKE_ARGS=	-C out/${BUILDTYPE}
