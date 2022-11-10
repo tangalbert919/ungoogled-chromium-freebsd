@@ -1,8 +1,8 @@
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	107.0.5304.88
+PORTVERSION=	107.0.5304.110
 UG_REVISION=	1
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	74a0f0ebf0c472210e0676fd723d36397f679cc0
+FREEBSD_HASH=	c7cb380ae1093aeb411597de55586f7f785abbb0
 
 CATEGORIES=	www
 
@@ -221,7 +221,7 @@ TEST_ALL_TARGET=	${TEST_TARGETS}
 .include <bsd.port.pre.mk>
 
 .if ${OSREL} == "12.3"
-BROKEN=		does not compile, libc++ too old
+IGNORE=		does not compile, libc++ too old
 .endif
 
 .if ${PORT_OPTIONS:MHEIMDAL_BASE} && !exists(/usr/lib/libkrb5.so)
