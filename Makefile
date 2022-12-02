@@ -1,8 +1,8 @@
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	107.0.5304.122
+PORTVERSION=	108.0.5359.72
 UG_REVISION=	1
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	c7cb380ae1093aeb411597de55586f7f785abbb0
+FREEBSD_HASH=	df86987b8e4db85fdf38474cef5d3f2ac7e417f1
 
 CATEGORIES=	www
 
@@ -100,7 +100,8 @@ SHEBANG_FILES=	chrome/tools/build/linux/chrome-wrapper buildtools/linux64/clang-
 MAKE_ARGS=	-C out/${BUILDTYPE}
 ALL_TARGET=	chrome
 
-BINARY_ALIAS=	python3=${PYTHON_CMD}
+BINARY_ALIAS=	python3=${PYTHON_CMD} \
+				moc=${PREFIX}/bin/moc-qt5
 
 # TODO bz@ : install libwidevinecdm.so (see third_party/widevine/cdm/BUILD.gn)
 #
@@ -303,7 +304,6 @@ pre-configure:
 	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-enable-paste-and-go-new-tab-button.patch
 	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-fix-building-without-safebrowsing.patch
 	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-remove-uneeded-ui.patch
-	patch -Np0 -d ${WRKDIR}/ungoogled-chromium-${PORTVERSION}-${UG_REVISION}/patches -i freebsd-patches/freebsd-remove-unused-preferences-fields.patch
 #.endfor
 	@${ECHO_MSG} "Applying patches"
 	@${PYTHON_CMD} \

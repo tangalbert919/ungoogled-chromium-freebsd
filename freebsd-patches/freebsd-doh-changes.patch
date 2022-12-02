@@ -1,11 +1,11 @@
---- core/ungoogled-chromium/doh-changes.patch.orig	2022-05-31 11:16:15.276862700 -0500
-+++ core/ungoogled-chromium/doh-changes.patch	2022-06-01 23:04:37.255215300 -0500
+--- core/ungoogled-chromium/doh-changes.patch.orig	2022-12-02 13:05:28.174997200 -0600
++++ core/ungoogled-chromium/doh-changes.patch	2022-12-02 13:15:32.431955200 -0600
 @@ -5,7 +5,7 @@
-  const base::Feature kDnsOverHttps {
-    "DnsOverHttps",
+  BASE_FEATURE(kDnsOverHttps,
+               "DnsOverHttps",
  -#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
 --    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 +-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
- -      base::FEATURE_ENABLED_BY_DEFAULT
+ -             base::FEATURE_ENABLED_BY_DEFAULT
  -#else
-        base::FEATURE_DISABLED_BY_DEFAULT
+               base::FEATURE_DISABLED_BY_DEFAULT
