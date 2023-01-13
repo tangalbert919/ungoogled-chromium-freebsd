@@ -109,7 +109,9 @@ BINARY_ALIAS=	python3=${PYTHON_CMD} \
 # Some parts don't have use_system_* flag, and can be turned on/off by using
 # replace_gn_files.py script, some parts just turned on/off for target host
 # OS "target_os == is_bsd", like libusb, libpci.
-GN_ARGS+=	fatal_linker_warnings=false \
+GN_ARGS+=	\
+		enable_backup_ref_ptr_support=false \
+		fatal_linker_warnings=false \
 		icu_use_data_file=false \
 		is_clang=true \
 		optimize_webui=true \
@@ -120,7 +122,7 @@ GN_ARGS+=	fatal_linker_warnings=false \
 		use_gnome_keyring=false \
 		use_lld=true \
 		use_partition_alloc=true \
-		use_partition_alloc_as_malloc=true \
+		use_partition_alloc_as_malloc=false \
 		use_sysroot=false \
 		use_system_freetype=false \
 		use_system_harfbuzz=true \
