@@ -1,6 +1,6 @@
---- extra/ungoogled-chromium/remove-uneeded-ui.patch.orig	2022-08-04 16:51:55.669173100 -0500
-+++ extra/ungoogled-chromium/remove-uneeded-ui.patch	2022-08-04 16:57:02.538693500 -0500
-@@ -125,7 +125,7 @@
+--- extra/ungoogled-chromium/remove-uneeded-ui.patch.orig	2023-01-24 18:29:13.000000000 -0600
++++ extra/ungoogled-chromium/remove-uneeded-ui.patch	2023-01-26 16:11:21.872959000 -0600
+@@ -128,7 +128,7 @@
  +          <div class="flex cr-padded-text">
  +            <div>$i18n{themes}</div><div class="secondary">[[themeSublabel_]]</div>
  +          </div>
@@ -8,4 +8,22 @@
 + <if expr="not is_posix">
             <template is="dom-if" if="[[prefs.extensions.theme.id.value]]">
               <div class="separator"></div>
- --- a/chrome/browser/resources/settings/autofill_page/passwords_section.html
+ --- a/chrome/browser/resources/settings/appearance_page/appearance_page.ts
+@@ -138,7 +138,7 @@
+      }
+  
+ -    let i18nId;
+-     // <if expr="is_linux">
++     // <if expr="is_posix">
+ +    let i18nId;
+      switch (this.systemTheme_) {
+        case SystemTheme.GTK:
+@@ -148,7 +148,7 @@
+          break;
+      }
+ -    // </if>
+--    // <if expr="not is_linux">
++-    // <if expr="not is_posix">
+ -    i18nId = 'chooseFromWebStore';
+ -    // </if>
+      this.themeSublabel_ = this.i18n(i18nId);
