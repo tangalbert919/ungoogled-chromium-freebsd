@@ -284,7 +284,7 @@ pre-configure:
 	cd ${WRKSRC} && ${SETENV} ${CONFIGURE_ENV} ${PYTHON_CMD} \
 		./build/linux/unbundle/replace_gn_files.py --system-libraries \
 		flac fontconfig freetype harfbuzz-ng icu libdrm libevent libpng \
-		libusb libwebp libxml libxslt openh264 opus snappy || ${FALSE}
+		libwebp libxml libxslt openh264 opus snappy || ${FALSE}
 	# Chromium uses an unreleased version of FFmpeg, so configure it
 .for brand in Chrome Chromium
 	${CP} -R \
