@@ -1,27 +1,18 @@
---- core/ungoogled-chromium/fix-building-without-safebrowsing.patch.orig	2023-01-24 18:29:13.000000000 -0600
-+++ core/ungoogled-chromium/fix-building-without-safebrowsing.patch	2023-01-26 16:07:15.995727400 -0600
-@@ -73,7 +73,7 @@
-    auto delegate = std::make_unique<AccuracyServiceDelegate>(profile);
- --- a/chrome/browser/chrome_content_browser_client.cc
- +++ b/chrome/browser/chrome_content_browser_client.cc
--@@ -4866,11 +4866,13 @@ ChromeContentBrowserClient::CreateThrott
-+@@ -4868,11 +4868,13 @@ ChromeContentBrowserClient::CreateThrott
-        &throttles);
-  #endif
-  
-@@ -85,9 +85,9 @@
+--- core/ungoogled-chromium/fix-building-without-safebrowsing.patch.orig	2023-02-07 16:42:53.000000000 -0600
++++ core/ungoogled-chromium/fix-building-without-safebrowsing.patch	2023-02-12 10:52:08.824437400 -0600
+@@ -71,9 +71,9 @@
     }
  +#endif
   
 - #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 + #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
     MaybeAddThrottle(browser_switcher::BrowserSwitcherNavigationThrottle::
--@@ -6288,26 +6290,7 @@ ChromeContentBrowserClient::GetSafeBrows
-+@@ -6290,26 +6292,7 @@ ChromeContentBrowserClient::GetSafeBrows
+-@@ -6422,26 +6424,7 @@ ChromeContentBrowserClient::GetSafeBrows
++@@ -6424,26 +6426,7 @@ ChromeContentBrowserClient::GetSafeBrows
       const std::vector<std::string>& allowlist_domains) {
     DCHECK_CURRENTLY_ON(BrowserThread::IO);
   
-@@ -314,7 +314,7 @@
+@@ -300,7 +300,7 @@
     DCHECK(download_item->IsSavePackageDownload());
   
  -#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
@@ -30,7 +21,7 @@
  +#if 0
     absl::optional<enterprise_connectors::AnalysisSettings> settings =
         safe_browsing::DeepScanningRequest::ShouldUploadBinary(download_item);
-@@ -1321,7 +1321,7 @@
+@@ -1307,7 +1307,7 @@
   #endif
   
  -#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
