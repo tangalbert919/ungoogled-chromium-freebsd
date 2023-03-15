@@ -1,8 +1,8 @@
 PORTNAME=	ungoogled-chromium
-PORTVERSION=	110.0.5481.177
+PORTVERSION=	111.0.5563.65
 UG_REVISION=	1
 # Set this to the commit corresponding to PORTVERSION from this link: https://github.com/freebsd/freebsd-ports/commits/main/www/chromium
-FREEBSD_HASH=	97b4cd7194245a56aefcedf4fcebdf2301f00145
+FREEBSD_HASH=	fa4b5f3e9b2a48568925d27f436a97e1acd48031
 
 CATEGORIES=	www
 
@@ -46,7 +46,7 @@ BUILD_DEPENDS=	bash:shells/bash \
 		${LOCALBASE}/libdata/pkgconfig/Qt5Widgets.pc:x11-toolkits/qt5-widgets \
 		patch>0:devel/patch
 
-LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-atk \
+LIB_DEPENDS=	libatk-bridge-2.0.so:accessibility/at-spi2-core \
 		libatspi.so:accessibility/at-spi2-core \
 		libspeechd.so:accessibility/speech-dispatcher \
 		libsnappy.so:archivers/snappy \
