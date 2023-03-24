@@ -4,7 +4,14 @@ FreeBSD packaging for [ungoogled-chromium](//github.com/ungoogled-software/ungoo
 
 ## Downloads
 
-You can find new downloads on the [Releases page](//github.com/tangalbert919/ungoogled-chromium-freebsd/releases) for this repository, and on the [ungoogled-chromium website](https://ungoogled-software.github.io/ungoogled-chromium-binaries).
+As of October 2022, ungoogled-chromium is available on [FreeBSD repositories](https://www.freshports.org/www/ungoogled-chromium/). You can install it using one of these commands:
+
+```
+pkg install www/ungoogled-chromium
+pkg install ungoogled-chromium
+```
+
+Alternatively, you can find new downloads on the [Releases page](//github.com/tangalbert919/ungoogled-chromium-freebsd/releases) for this repository, and on the [ungoogled-chromium website](https://ungoogled-software.github.io/ungoogled-chromium-binaries).
 
 ## Building
 
